@@ -19,6 +19,8 @@ before_install:
 # before_script:
 script:
   - sleep 30
+  - docker-compose ps
+  - docker-compose logs
   - docker-compose exec web npm test
 
 # #deploy
