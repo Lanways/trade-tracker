@@ -1,0 +1,14 @@
+{
+  "include": [
+    "app.js"
+  ],
+  "reporter": [
+    "text",
+    "html"
+  ],
+  "check-coverage": true,
+  "lines": 20,
+  "statements": 10,
+  "functions": 10,
+  "braches": 10
+}
