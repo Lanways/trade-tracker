@@ -20,6 +20,7 @@ before_install:
 #   - sequelize db:migrate
 
 script:
+  - sleep 30
   - docker-compose exec web npm test
 
 # #deploy
