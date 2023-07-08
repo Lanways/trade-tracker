@@ -21,7 +21,7 @@ before_install:
 
 script:
   - sleep 30
-  - docker-compose exec web npm test
+  - docker-compose exec web npm test || (docker-compose logs && exit 1)
 
 # #deploy
 # deploy:
