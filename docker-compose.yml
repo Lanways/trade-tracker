@@ -1,15 +1,23 @@
 version: '3'
 services:
-  app:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: trade_tracker_test
+    volumes:
+      - ./mysql:/var/lib/mysql
+  web:
     build: .
+    command: npm start
+    volumes:
+      - .:/usr/src/app
     ports:
       - "3000:3000"
     depends_on:
       - db
     environment:
-      - DATABASE_HOST=db
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: mydatabase
+      DATABASE_HOST: db
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: trade_tracker_test
