@@ -12,13 +12,11 @@ env:
 # 在 install 前執行的指令
 before_install:
   # - mysql -e 'CREATE DATABASE IF NOT EXISTS ac_twitter_workspace_test default character set utf8mb4 collate utf8mb4_unicode_ci;'
+  - npm ci
   - docker-compose up -d
-  # - npm install sequelize-cli -g
 
 # 在執行測試之前的指令
 # before_script:
-#   - sequelize db:migrate
-
 script:
   - sleep 30
   - docker-compose exec web npm test || (docker-compose logs && exit 1)
