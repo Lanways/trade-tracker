@@ -13,14 +13,11 @@ env:
 before_install:
   # - mysql -e 'CREATE DATABASE IF NOT EXISTS ac_twitter_workspace_test default character set utf8mb4 collate utf8mb4_unicode_ci;'
   - npm ci
-  - docker-compose up -d
+  - docker-compose up --build -d
 
 # 在執行測試之前的指令
 # before_script:
 script:
-  - sleep 30
-  - docker-compose ps
-  - docker-compose logs
   - docker-compose run web npm test
 
 # #deploy
