@@ -7,11 +7,9 @@ services:
 
 # 設定參數(Travis CI 會按照參數分別執行)
 env:
-  # - NODE_ENV=travis JWT_SECRET=alphacamp
 
 # 在 install 前執行的指令
 before_install:
-  # - mysql -e 'CREATE DATABASE IF NOT EXISTS ac_twitter_workspace_test default character set utf8mb4 collate utf8mb4_unicode_ci;'
   - npm ci
   - docker-compose up --build -d
 
@@ -20,11 +18,8 @@ before_install:
 script:
   - docker-compose run web npm test
 
-# #deploy
-# deploy:
-#   provider: heroku
-#   api_key:
-#     secure:
-#   app:
-#   on:
-#     repo:
+deploy:
+  provider: script
+  script: npx render-cli deploy --auto-approve
+  on:
+    branch: main
