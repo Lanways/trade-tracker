@@ -12,11 +12,11 @@ module.exports = {
     return res.rows[0]
   },
 
-  createUser: async (username, password, email) => {
-    const currentTime = new Date()
+  createUser: async (username, account, password, email) => {
+    // const currentTime = new Date()
     const res = await pool.query(
-      'INSERT INTO users (username, password, email, created_on) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, password, email, currentTime]
+      'INSERT INTO users (username, account, password, email) VALUES ($1, $2, $3, $4) RETURNING *',
+      [username, account, password, email]
     );
     return res.rows[0]
   },
