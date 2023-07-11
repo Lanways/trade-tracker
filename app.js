@@ -1,25 +1,21 @@
 const express = require('express')
-const { Pool } = require('pg')
-
 const app = express()
+const db = require('./db/db')
 
-const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'trade_tracker',
-  user: 'postgres',
-  password: 'password'
-})
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('Failed to connect to the PostgreSQL database:', err);
-  } else {
-    console.log('Connected to the PostgreSQL database successfully!');
+
+app.post('/users', async (req, res) => {
+  try {
+    let { username, password, email } = req.body
+    const user = await db.createUser(username, password, email)
+    res.status(200).json(user)
+  } catch (error) {
+    console.error(error)
+    res.status(500).send('Internal server error ')
   }
-  pool.end();
-});
-
+})
 
 app.get('/', (req, res) => {
   res.send('Hello World!omg')
