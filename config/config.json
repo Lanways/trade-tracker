@@ -1,13 +1,13 @@
 {
   "development": {
-    "username": "root",
+    "username": "postgres",
     "password": "password",
     "database": "trade_tracker",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": ""
   },
   "test": {
-    "username": "root",
+    "username": "postgres",
     "password": "password",
     "database": "trade_tracker_test",
     "host": "127.0.0.1",
