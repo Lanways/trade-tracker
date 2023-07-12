@@ -9,7 +9,7 @@ const pool = new Pool({
   connectionString,
 });
 
-const sqlFilePath = path.join(__dirname, 'migrations', '001-create-users-table.sql');
+const sqlFilePath = path.join(__dirname, '..', 'migrations', '001-create-users-table.sql');
 
 fs.readFile(sqlFilePath, 'utf8', async (err, data) => {
   if (err) {
