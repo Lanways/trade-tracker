@@ -8,7 +8,7 @@
     "start:prod": "NODE_ENV=production node app.js",
     "dev": "set NODE_ENV=development && nodemon app.js",
     "test": "mocha test --exit --timeout 5000",
-    "db:seed": "node db/seed.js"
+    "migrate": "node path/to/your/script.js"
   },
   "keywords": [],
   "author": "",
