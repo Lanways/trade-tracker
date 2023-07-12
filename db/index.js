@@ -23,4 +23,4 @@ fs.readFile(sqlFilePath, 'utf8', async (err, data) => {
   } catch (err) {
     console.error(`Error executing query: ${err}`);
   }
-});
+})
