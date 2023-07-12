@@ -20,5 +20,12 @@ module.exports = {
     );
     return res.rows[0]
   },
-  // 更多针对 users 表的操作...
+  findOneUserByAccount: async (account) => {
+    const res = await pool.query('SELECT * FROM users WHERE account = $1', [account]);
+    return res.rows[0]
+  },
+  getUserById: async (id) => {
+    const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return res.rows[0]
+  }
 };

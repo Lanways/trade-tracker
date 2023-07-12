@@ -1,5 +1,7 @@
 const db = require('../db/db')
 const bcrypt = require('bcryptjs')
+const helpers = require('../_helpers')
+const jwt = require('jsonwebtoken')
 
 const userServices = {
   signUp: async ({ username, account, password, email }, cb) => {
@@ -20,6 +22,21 @@ const userServices = {
       } else {
         cb(err)
       }
+    }
+  },
+  signIn: async (req, cb) => {
+    try {
+      const { password, ...userWithoutPassword } = helpers.getUser(req)
+      const token = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '30d' })
+      cb(null, {
+        status: 'success',
+        data: {
+          token,
+          user: userWithoutPassword
+        }
+      })
+    } catch (err) {
+      cb(err)
     }
   }
 }
