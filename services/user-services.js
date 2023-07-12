@@ -15,9 +15,9 @@ const userServices = {
     } catch (err) {
       if (err.code === '23505') {  // postgre 唯一性約束錯誤代碼
         if (err.detail.includes('account')) {
-          cb({ message: 'Account already exists' })
+          cb('Account already exists')
         } else if (err.detail.includes('email')) {
-          cb({ message: 'Email already exists' })
+          cb('Email already exists')
         }
       } else {
         cb(err)
