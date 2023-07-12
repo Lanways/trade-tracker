@@ -16,3 +16,5 @@ node_modules
 #nyc
 coverage/
 .nyc_output/
+
+.env

@@ -12,13 +12,20 @@ module.exports = {
     return res.rows[0]
   },
 
-  createUser: async (username, password, email) => {
-    const currentTime = new Date()
+  createUser: async (username, account, password, email) => {
+    // const currentTime = new Date()
     const res = await pool.query(
-      'INSERT INTO users (username, password, email, created_on) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, password, email, currentTime]
+      'INSERT INTO users (username, account, password, email) VALUES ($1, $2, $3, $4) RETURNING *',
+      [username, account, password, email]
     );
     return res.rows[0]
   },
-  // 更多针对 users 表的操作...
+  findOneUserByAccount: async (account) => {
+    const res = await pool.query('SELECT * FROM users WHERE account = $1', [account]);
+    return res.rows[0]
+  },
+  getUserById: async (id) => {
+    const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return res.rows[0]
+  }
 };
