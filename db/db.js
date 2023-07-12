@@ -1,9 +1,9 @@
 const { Pool } = require('pg')
 const pool = new Pool({
-  host: 'localhost',
-  database: 'trade_tracker',
-  user: 'postgres',
-  password: 'password',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'trade_tracker',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'password',
 })
 
 module.exports = {

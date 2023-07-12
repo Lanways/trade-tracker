@@ -5,6 +5,7 @@ const express = require('express')
 const app = express()
 const routes = require('./routes')
 const passport = require('./config/passport')
+const port = process.env.PORT || 3000
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -18,8 +19,8 @@ app.get('/', (req, res) => {
 
 app.use(routes)
 
-app.listen(3000, () => {
-  console.log(`express server is running on http://localhost:3000`)
+app.listen(port, () => {
+  console.log(`express server is running on http://localhost:${port}`)
 })
 
 module.exports = app
