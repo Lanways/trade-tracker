@@ -13,7 +13,7 @@ const userServices = {
         user
       })
     } catch (err) {
-      if (err.code === '23505') {  // 这是 PostgreSQL 的唯一性约束违反的错误代码
+      if (err.code === '23505') {  // postgre 唯一性約束錯誤代碼
         if (err.detail.includes('account')) {
           cb({ message: 'Account already exists' })
         } else if (err.detail.includes('email')) {
