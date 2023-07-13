@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000
 
 
 app.use(cors({
-  origin: 'http://localhost:3001'
+  origin: 'http://localhost:3000'
 }))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
