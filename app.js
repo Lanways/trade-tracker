@@ -5,8 +5,13 @@ const express = require('express')
 const app = express()
 const routes = require('./routes')
 const passport = require('./config/passport')
+const cors = require('cors')
 const port = process.env.PORT || 3000
 
+
+app.use(cors({
+  origin: 'http://localhost:3001'
+}))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(passport.initialize())
