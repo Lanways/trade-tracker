@@ -12,6 +12,8 @@ Desktop.ini
 node_modules
 *.log
 *.gz
+temp/
+upload/
 
 #nyc
 coverage/
