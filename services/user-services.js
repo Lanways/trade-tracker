@@ -38,6 +38,15 @@ const userServices = {
     } catch (err) {
       cb(err)
     }
+  },
+  getUser: async (req, cb) => {
+    const id = req.params.id
+    const { password, ...user } = await db.getUserById(id)
+    if (!user) return cb(`User didn't exist`)
+    return cb(null, {
+      status: 'success',
+      user
+    })
   }
 }
 
