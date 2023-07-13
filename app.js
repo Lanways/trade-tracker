@@ -7,6 +7,10 @@ const routes = require('./routes')
 const passport = require('./config/passport')
 const port = process.env.PORT || 3000
 
+
+app.use(cors({
+  origin: 'http://localhost:3001'
+}))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(passport.initialize())
