@@ -8,6 +8,7 @@ const userServices = {
     try {
       const hashed = await bcrypt.hash(password, 10)
       const user = await db.createUser(username, account, hashed, email)
+      delete user.password
       return cb(null, {
         status: 'success',
         user
