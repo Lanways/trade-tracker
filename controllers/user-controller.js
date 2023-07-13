@@ -21,6 +21,11 @@ const userController = {
   },
   getUser: (req, res, next) => {
     userServices.getUser(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  putUser: (req, res, next) => {
+    const { username, introduction } = req.body
+    if (!username) return res.status(400).json({ status: 'error', message: 'username is required' })
+    userServices.putUser(req, { username, introduction }, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 
 }

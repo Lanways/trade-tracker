@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express')
 const app = express()
 const routes = require('./routes')
+const path = require('path')
 const passport = require('./config/passport')
 const cors = require('cors')
 const port = process.env.PORT || 3000
@@ -13,6 +14,7 @@ app.use(cors({
   origin: 'http://localhost:3000'
 }))
 app.use(express.urlencoded({ extended: true }))
+app.use('/upload', express.static(path.join(__dirname, 'upload')))
 app.use(express.json())
 app.use(passport.initialize())
 
