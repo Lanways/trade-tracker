@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS replies;
+
 CREATE TABLE replies (
   id SERIAL PRIMARY KEY,
   user_id INT REFERENCES users(id),

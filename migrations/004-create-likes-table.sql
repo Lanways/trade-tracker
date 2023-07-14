@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS likes;
+
 CREATE TABLE likes (
   id SERIAL PRIMARY KEY,
   user_id INT REFERENCES user(id)
