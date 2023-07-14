@@ -1,26 +1,43 @@
-const fs = require('fs');
-const path = require('path');
-const { Pool } = require('pg');
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+const fs = require('fs')
+const path = require('path')
+const { Pool } = require('pg')
 
-// 从环境变量获取连接字符串
-const connectionString = process.env.DATABASE_URL;
+let pool
+if (process.env.NODE_ENV === "production") {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  })
+} else {
+  pool = new Pool({
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  })
+}
+const sqlDirectory = path.join(__dirname, '..', 'migrations')
 
-const pool = new Pool({
-  connectionString,
-});
-
-const sqlFilePath = path.join(__dirname, '..', 'migrations', '001-create-users-table.sql');
-
-fs.readFile(sqlFilePath, 'utf8', async (err, data) => {
+fs.readdir(sqlDirectory, async (err, files) => {
   if (err) {
-    console.error(`Error reading file from disk: ${err}`);
-    return;
+    console.error(`Error reading directory: ${err}`)
+    return
   }
 
-  try {
-    const res = await pool.query(data);
-    console.log(res);
-  } catch (err) {
-    console.error(`Error executing query: ${err}`);
+  for (const file of files) {
+    if (path.extname(file) === '.sql') {
+      const sqlFilePath = path.join(sqlDirectory, file)
+
+      try {
+        const data = fs.readFileSync(sqlFilePath, 'utf8')
+        const res = await pool.query(data)
+        console.log(`Executed file: ${file}`)
+        console.log(res)
+      } catch (err) {
+        console.error(`Error executing file ${file}: ${err}`)
+      }
+    }
   }
 })
