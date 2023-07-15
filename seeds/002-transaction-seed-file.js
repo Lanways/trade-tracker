@@ -38,8 +38,11 @@ async function seedTransaction() {
         console.error(`Error: ${err.message}`)
       }
     }
+  } else {
+    console.log('table is not empty')
   }
   console.log('success created transaction seeds')
   await pool.end()
 }
-seedTransaction().catch(err => console.error(err))
+
+seedTransaction().catch(err => console.error(err.message))

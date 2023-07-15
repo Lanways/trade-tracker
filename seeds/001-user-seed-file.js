@@ -19,22 +19,28 @@ if (process.env.NODE_ENV === "production") {
 }
 
 async function seedUsers() {
-  for (let i = 1; i <= 10; i++) {
-    let username = `user${i}`
-    let account = `account${i}`
-    let password = await bcrypt.hash('12345', 10)
-    let email = `user${i}@example.com`
-    let introduction = faker.lorem.sentence()
-    let role = 'user'
+  const res = await pool.query('SELECT COUNT(*) AS count FROM users')
+  const count = res.rows[0].count
+  if (count === 0) {
+    for (let i = 1; i <= 10; i++) {
+      let username = `user${i}`
+      let account = `account${i}`
+      let password = await bcrypt.hash('12345', 10)
+      let email = `user${i}@example.com`
+      let introduction = faker.lorem.sentence()
+      let role = 'user'
 
-    await pool.query(
-      `INSERT INTO users (username, account, password, email, introduction, role, created_on, updated_on)
+      await pool.query(
+        `INSERT INTO users (username, account, password, email, introduction, role, created_on, updated_on)
       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      [username, account, password, email, introduction, role]
-    )
+        [username, account, password, email, introduction, role]
+      )
+    }
+  } else {
+    console.log('table is not empty')
   }
   console.log('success create users seeds')
   await pool.end()
 }
 
-seedUsers().catch(err => console.error(err))
+seedUsers().catch(err => console.error(err.message))
