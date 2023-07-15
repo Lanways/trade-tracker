@@ -19,8 +19,8 @@ before_install:
 script:
   - npm test
 
-deploy:
-  provider: script
-  script: npx render-cli deploy --auto-approve
-  on:
-    branch: main
+# deploy:
+#   provider: script
+#   script: npx render-cli deploy --auto-approve
+#   on:
+#     branch: main
