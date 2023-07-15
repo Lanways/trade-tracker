@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node db/index.js && node app.js",
-    "dev": "set NODE_ENV=development && nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "mocha test --exit --timeout 5000",
-    "migrate": "node path/to/your/script.js"
+    "migrate": "node path/to/your/script.js",
+    "setupDb": "node db/index.js && node seeds/001-user-seed-file.js && node seeds/002-transaction-seed-file.js"
   },
   "keywords": [],
   "author": "",
