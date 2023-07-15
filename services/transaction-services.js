@@ -12,7 +12,6 @@ const transactionsServices = {
     } catch (err) {
       cb(err)
     }
-
   }
 }
 
