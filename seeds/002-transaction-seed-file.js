@@ -20,9 +20,10 @@ if (process.env.NODE_ENV === "production") {
 
 async function seedTransaction() {
   const res = await pool.query('SELECT id FROM users')
-  const countRes = await pool.query('SELECT COUNT(*) AS count FROM users')
+  const countRes = await pool.query('SELECT COUNT(*) AS count FROM transactions')
   const count = countRes.rows[0].count
-  if (count === 0) {
+  console.log('transaction table count =', count)
+  if (count === '0') {
     for (let userId of res.rows.map(row => row.id)) {
       try {
         for (let i = 0; i < 10; i++) {
@@ -38,10 +39,11 @@ async function seedTransaction() {
         console.error(`Error: ${err.message}`)
       }
     }
+    console.log('success created transaction seeds')
   } else {
-    console.log('table is not empty')
+    console.log('transaction table is not empty')
   }
-  console.log('success created transaction seeds')
+
   await pool.end()
 }
 

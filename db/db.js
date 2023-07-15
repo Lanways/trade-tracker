@@ -45,5 +45,9 @@ module.exports = {
       [user_id, action, quantity, price, transaction_date, description]
     )
     return res.rows[0]
+  },
+  getTransactionById: async (id) => {
+    const res = await pool.query('SELECT * FROM transactions WHERE id = $1', [id])
+    return res.rows[0]
   }
 }

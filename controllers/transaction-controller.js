@@ -10,6 +10,11 @@ const transactionsController = {
     if (description.length > 200) return res.status(400).json({ status: 'error', message: `The character count can't excced 200` })
 
     transactionsServices.postTransaction(req, { action, quantity, price, transaction_date, description }, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getTransaction: (req, res, next) => {
+    const transactionId = req.params.id
+    if (!transactionId) return res.status(400).json({ status: 'error', message: `This transaction isn't exist!` })
+    transactionsServices.getTransaction(req, { transactionId }, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 
