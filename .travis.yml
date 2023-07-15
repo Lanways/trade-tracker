@@ -10,8 +10,9 @@ services:
 
 # 在 install 前執行的指令
 before_install:
-  - npm ci
-  - npm install -g render-cli
+  - npm install
+  # - npm ci
+  # - npm install -g render-cli
   # - docker-compose up --build -d
 
 # 在執行測試之前的指令

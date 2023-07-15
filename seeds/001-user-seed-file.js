@@ -33,7 +33,7 @@ async function seedUsers() {
       [username, account, password, email, introduction, role]
     )
   }
-  console.log('success create transaction seeds')
+  console.log('success create users seeds')
   await pool.end()
 }
 
