@@ -39,7 +39,7 @@ async function seedTransaction() {
       }
     }
   }
-  console.log('success created user seeds')
+  console.log('success created transaction seeds')
   await pool.end()
 }
 seedTransaction().catch(err => console.error(err))
