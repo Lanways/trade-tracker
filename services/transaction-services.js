@@ -20,6 +20,27 @@ const transactionsServices = {
       status: 'success',
       transaction
     })
+  },
+  putTransaction: async (req, { action, quantity, price, transaction_date, description }, cb) => {
+    try {
+      const transactionId = req.params.id
+      const transaction = await db.getTransactionById(transactionId)
+      if (!transaction) return cb('transaction is not exist!')
+      const updateTransaction = await db.putTransactionById(
+        action,
+        quantity,
+        price,
+        transaction_date,
+        description,
+        transactionId
+      )
+      return cb(null, {
+        status: 'success',
+        updateTransaction
+      })
+    } catch (err) {
+      cb(err)
+    }
   }
 }
 
