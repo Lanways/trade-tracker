@@ -41,6 +41,20 @@ const transactionsServices = {
     } catch (err) {
       cb(err)
     }
+  },
+  removeTransaction: async (req, cb) => {
+    try {
+      const transactionId = req.params.id
+      const transaction = await db.getTransactionById(transactionId)
+      if (!transaction) return cb(`transaction isn't exist`)
+      const deleteTransaction = await db.deleteTransactionById(transactionId)
+      return cb(null, {
+        status: 'success',
+        deleteTransaction
+      })
+    } catch (err) {
+      cb(err)
+    }
   }
 }
 
