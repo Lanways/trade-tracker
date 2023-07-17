@@ -33,8 +33,10 @@ fs.readdir(sqlDirectory, async (err, files) => {
       try {
         const data = fs.readFileSync(sqlFilePath, 'utf8')
         const res = await pool.query(data)
-        console.log(`Executed file: ${file}`)
-        console.log(res)
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`Executed file: ${file}`)
+          console.log(res)
+        }
       } catch (err) {
         console.error(`Error executing file ${file}: ${err}`)
       }

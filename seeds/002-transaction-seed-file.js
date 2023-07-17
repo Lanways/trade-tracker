@@ -23,7 +23,7 @@ async function seedTransaction() {
   const countRes = await pool.query('SELECT COUNT(*) AS count FROM transactions')
   const count = countRes.rows[0].count
   console.log('transaction table count =', count)
-  if (count === '0') {
+  if (count === 0) {
     for (let userId of res.rows.map(row => row.id)) {
       try {
         for (let i = 0; i < 10; i++) {

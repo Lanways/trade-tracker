@@ -22,7 +22,7 @@ async function seedUsers() {
   const res = await pool.query('SELECT COUNT(*) AS count FROM users')
   const count = res.rows[0].count
   console.log('user table count =', count)
-  if (count === '0') {
+  if (count === 0) {
     for (let i = 1; i <= 10; i++) {
       let username = `user${i}`
       let account = `account${i}`
