@@ -8,7 +8,8 @@
     "dev": "nodemon app.js",
     "test": "mocha test --exit --timeout 5000",
     "migrate": "node path/to/your/script.js",
-    "setupDb": "node db/index.js && node seeds/001-user-seed-file.js && node seeds/002-transaction-seed-file.js"
+    "setupmodel": "node db/index.js",
+    "setupseeds":"node seeds/001-user-seed-file.js && node seeds/002-transaction-seed-file.js"
   },
   "keywords": [],
   "author": "",
