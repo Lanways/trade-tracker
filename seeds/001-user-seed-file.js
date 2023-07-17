@@ -21,7 +21,8 @@ if (process.env.NODE_ENV === "production") {
 async function seedUsers() {
   const res = await pool.query('SELECT COUNT(*) AS count FROM users')
   const count = res.rows[0].count
-  if (count === 0) {
+  console.log('user table count =', count)
+  if (count === '0') {
     for (let i = 1; i <= 10; i++) {
       let username = `user${i}`
       let account = `account${i}`
@@ -36,10 +37,10 @@ async function seedUsers() {
         [username, account, password, email, introduction, role]
       )
     }
+    console.log('success create users seeds')
   } else {
-    console.log('table is not empty')
+    console.log('user table is not empty')
   }
-  console.log('success create users seeds')
   await pool.end()
 }
 
