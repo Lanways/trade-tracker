@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "production") {
 async function seedTransaction() {
   const res = await pool.query('SELECT id FROM users')
   const countRes = await pool.query('SELECT COUNT(*) AS count FROM transactions')
-  const count = countRes.rows[0].count
+  const count = Number(countRes.rows[0].count)
   console.log('transaction table count =', count)
   if (count === 0) {
     for (let userId of res.rows.map(row => row.id)) {
