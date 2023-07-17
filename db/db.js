@@ -57,5 +57,9 @@ module.exports = {
   deleteTransactionById: async (transactionId) => {
     const res = await pool.query('DELETE FROM transactions WHERE id = $1 RETURNING *', [transactionId])
     return res.rows[0]
+  },
+  getTransactionsByDateRange: async (userId, startDate, endDate) => {
+    const res = await pool.query('SELECT * FROM transactions WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3 ORDER BY transaction_date', [userId, startDate, endDate])
+    return res.rows
   }
 }

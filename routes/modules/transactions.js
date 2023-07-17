@@ -6,6 +6,7 @@ const transactionsController = require('../../controllers/transaction-controller
 router.get('/:id', authenticated, transactionsController.getTransaction)
 router.put('/:id', authenticated, transactionsController.putTransaction)
 router.delete('/:id', authenticated, transactionsController.removeTransaction)
+router.post('/range', authenticated, transactionsController.getTransactions)
 router.post('/', authenticated, transactionsController.postTransaction)
 
 module.exports = router

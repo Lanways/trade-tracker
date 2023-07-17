@@ -1,5 +1,6 @@
 const db = require('../db/db')
 const helpers = require('../_helpers')
+const { Pool } = require('pg')
 
 const transactionsServices = {
   postTransaction: async (req, { action, quantity, price, transaction_date, description }, cb) => {
@@ -55,6 +56,14 @@ const transactionsServices = {
     } catch (err) {
       cb(err)
     }
+  },
+  getTransactions: async (req, { startDate, endDate }, cb) => {
+    const userId = helpers.getUser(req).id
+    const transactions = await db.getTransactionsByDateRange(userId, startDate, endDate)
+    return cb(null, {
+      status: 'success',
+      transactions
+    })
   }
 }
 
