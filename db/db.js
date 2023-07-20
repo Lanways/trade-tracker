@@ -40,9 +40,10 @@ module.exports = {
     return updatedUserRes.rows[0]
   },
   createTransaction: async (user_id, action, quantity, price, transaction_date, description) => {
+    const openQuantity = quantity
     const res = await pool.query(
-      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [user_id, action, quantity, price, transaction_date, description]
+      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [user_id, action, quantity, price, transaction_date, description, openQuantity]
     )
     return res.rows[0]
   },
@@ -51,7 +52,7 @@ module.exports = {
     return res.rows[0]
   },
   putTransactionById: async (action, quantity, price, transaction_date, description, transactionId) => {
-    const res = await pool.query('UPDATE transactions SET action = $1, quantity = $2, price = $3, transaction_date = $4, description = $5, updated_on = NOW() WHERE id = $6 RETURNING * ', [action, quantity, price, transaction_date, description, transactionId])
+    const res = await pool.query('UPDATE transactions SET action = $1, quantity = $2, price = $3, transaction_date = $4, description = $5 updated_on = NOW() WHERE id = $6 RETURNING * ', [action, quantity, price, transaction_date, description, transactionId])
     return res.rows[0]
   },
   deleteTransactionById: async (transactionId) => {
@@ -59,7 +60,41 @@ module.exports = {
     return res.rows[0]
   },
   getTransactionsByDateRange: async (userId, startDate, endDate) => {
-    const res = await pool.query('SELECT * FROM transactions WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3 ORDER BY transaction_date', [userId, startDate, endDate])
+    const res = await pool.query('SELECT * FROM transactions WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3 ORDER BY created_on', [userId, startDate, endDate])
     return res.rows
+  },
+  findOppositeOpenTransaction: async (userId, action) => {
+    const oppositeAction = action === "buy" ? "sell" : "buy"
+    const res = await pool.query(
+      `SELECT * FROM transactions WHERE user_id = $1 AND action = $2 AND status = 'open' AND open_quantity > 0 ORDER BY created_on ASC LIMIT 1`,
+      [userId, oppositeAction]
+    )
+    return res.rows[0]
+  },
+  createClosure: async (openTransactionId, closedTransactionId, closedQuantity, preice) => {
+    const res = await pool.query(
+      'INSERT INTO closures (open_transaction_id, closed_transaction_id, closed_quantity, price) VALUES ($1, $2, $3 ,$4)',
+      [openTransactionId, closedTransactionId, closedQuantity, preice]
+    )
+    return res.rows[0]
+  },
+  updateTransactionStatus: async (id, openQuantity, status, category) => {
+    if (category) {
+      await pool.query(
+        `UPDATE transactions SET category = $1, open_quantity = $2, status = $3 WHERE id = $4`,
+        [category, openQuantity, status, id]
+      )
+    } else {
+      await pool.query(
+        `UPDATE transactions SET open_quantity = $1, status = $2 WHERE id = $3`,
+        [openQuantity, status, id]
+      )
+    }
+  },
+  updateClosingTransaction: async (quantity, category, openQuantity, status, transactionId) => {
+    await pool.query(
+      `UPDATE transactions SET quantity = $1, category = $2, open_quantity = $3, status = $4 WHERE id = $5`,
+      [quantity, category, openQuantity, status, transactionId]
+    )
   }
 }
