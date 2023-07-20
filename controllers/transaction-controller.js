@@ -42,9 +42,7 @@ const transactionsController = {
   deletePublic: (req, res, next) => {
     transactionsServices.deletePublic(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getPublic: (req, res, next) => {
-    transactionsServices.deletePublic(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
+
   getPublicTransactions: (req, res, next) => {
     transactionsServices.getPublicTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
