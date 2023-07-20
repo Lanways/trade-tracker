@@ -62,19 +62,15 @@ module.exports = {
     return res.rows
   },
   changePublic: async (newPublicValue, transactionId) => {
-    const query = 'UPDATE transactions SET is_public = $1 WHERE id = $2'
-    const values = [newPublicValue, transactionId]
-    const res = await pool.query(query, values)
+    const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
   deletePublic: async (newPublicValue, transactionId) => {
-    const query = 'UPDATE transactions SET is_public = $1 WHERE id = $2'
-    const values = [newPublicValue, transactionId]
-    const res = await pool.query(query, values)
+    const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
   getPublicTransactions: async (values) => {
-    const res = await pool.query('SELECT * FROM transactions WHERE is_public = $1', [values])
+    const res = await pool.query('SELECT * FROM transactions WHERE is_public = true')
     return res.rows
   }
 }
