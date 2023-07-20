@@ -35,8 +35,19 @@ const transactionsController = {
     if (!endDate) return res.status(400).json({ status: 'error', message: 'endDate is required!' })
 
     transactionsServices.getTransactions(req, { startDate, endDate }, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  postPublic: (req, res, next) => {
+    transactionsServices.postPublic(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  deletePublic: (req, res, next) => {
+    transactionsServices.deletePublic(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getPublic: (req, res, next) => {
+    transactionsServices.deletePublic(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getPublicTransactions: (req, res, next) => {
+    transactionsServices.getPublicTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
-
 }
 
 module.exports = transactionsController

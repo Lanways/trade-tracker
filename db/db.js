@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === "production") {
   })
 }
 
-
 module.exports = {
   getUserByName: async (username) => {
     const res = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -60,6 +59,22 @@ module.exports = {
   },
   getTransactionsByDateRange: async (userId, startDate, endDate) => {
     const res = await pool.query('SELECT * FROM transactions WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3 ORDER BY transaction_date', [userId, startDate, endDate])
+    return res.rows
+  },
+  changePublic: async (newPublicValue, transactionId) => {
+    const query = 'UPDATE transactions SET is_public = $1 WHERE id = $2'
+    const values = [newPublicValue, transactionId]
+    const res = await pool.query(query, values)
+    return res.rows[0]
+  },
+  deletePublic: async (newPublicValue, transactionId) => {
+    const query = 'UPDATE transactions SET is_public = $1 WHERE id = $2'
+    const values = [newPublicValue, transactionId]
+    const res = await pool.query(query, values)
+    return res.rows[0]
+  },
+  getPublicTransactions: async (values) => {
+    const res = await pool.query('SELECT * FROM transactions WHERE is_public = $1', [values])
     return res.rows
   }
 }
