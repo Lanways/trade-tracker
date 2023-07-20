@@ -98,7 +98,6 @@ const transactionsServices = {
   getPublicTransactions: async (req, cb) => {
     const values = true
     const transactions = await db.getPublicTransactions(values)
-    // if (!transactions) return cb('There are no public transaction.')
     return cb(null, {
       status: 'success',
       transactions
