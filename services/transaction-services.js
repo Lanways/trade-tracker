@@ -64,6 +64,43 @@ const transactionsServices = {
       status: 'success',
       transactions
     })
+  },
+  postPublic: async (req, cb) => {
+    const transactionId = req.params.id
+    const transaction = await db.getTransactionById(transactionId)
+    if (!transaction) return cb(`transaction isn't exist`)
+    if (transaction.is_public === false) {
+      await db.changePublic(true, transactionId)
+      const updateTransaction = await db.getTransactionById(transactionId)
+      return cb(null, {
+        status: 'success',
+        transaction: updateTransaction
+      })
+    } else {
+      return cb('This transaction is already public.')
+    }
+  },
+  deletePublic: async (req, cb) => {
+    const transactionId = req.params.id
+    const transaction = await db.getTransactionById(transactionId)
+    if (!transaction) return cb(`transaction isn't exist`)
+    if (transaction.is_public === true) {
+      await db.deletePublic(false, transactionId)
+      const updateTransaction = await db.getTransactionById(transactionId)
+      return cb(null, {
+        status: 'success',
+        transaction: updateTransaction
+      })
+    } else {
+      return cb('This transaction was originally private.')
+    }
+  },
+  getPublicTransactions: async (req, cb) => {
+    const transactions = await db.getPublicTransactions()
+    return cb(null, {
+      status: 'success',
+      transactions
+    })
   }
 }
 
