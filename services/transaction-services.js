@@ -96,8 +96,7 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const values = true
-    const transactions = await db.getPublicTransactions(values)
+    const transactions = await db.getPublicTransactions()
     return cb(null, {
       status: 'success',
       transactions
