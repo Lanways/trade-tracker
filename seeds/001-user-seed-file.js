@@ -1,27 +1,10 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
 const bcrypt = require('bcryptjs')
 const faker = require('faker')
-const { Pool } = require('pg')
-let pool
-if (process.env.NODE_ENV === "production") {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  })
-} else {
-  pool = new Pool({
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  })
-}
-
-async function seedUsers() {
+module.exports = async function seedUsers(pool) {
   const res = await pool.query('SELECT COUNT(*) AS count FROM users')
   const count = Number(res.rows[0].count)
   console.log('user table count =', count)
+
   if (count === 0) {
     for (let i = 1; i <= 10; i++) {
       let username = `user${i}`
@@ -41,7 +24,4 @@ async function seedUsers() {
   } else {
     console.log('user table is not empty')
   }
-  await pool.end()
 }
-
-seedUsers().catch(err => console.error(err.message))

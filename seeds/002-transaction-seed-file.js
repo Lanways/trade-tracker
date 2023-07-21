@@ -1,28 +1,10 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
-
-const { Pool } = require('pg')
-
-let pool
-if (process.env.NODE_ENV === "production") {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  })
-} else {
-  pool = new Pool({
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  })
-}
-
-async function seedTransaction() {
+module.exports = async function seedTransactions(pool) {
   const res = await pool.query('SELECT id FROM users')
   const countRes = await pool.query('SELECT COUNT(*) AS count FROM transactions')
   const count = Number(countRes.rows[0].count)
   console.log('transaction table count =', count)
+
+
   if (count === 0) {
     for (let userId of res.rows.map(row => row.id)) {
       try {
@@ -43,8 +25,5 @@ async function seedTransaction() {
   } else {
     console.log('transaction table is not empty')
   }
-
-  await pool.end()
 }
 
-seedTransaction().catch(err => console.error(err.message))
