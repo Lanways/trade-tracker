@@ -18,7 +18,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, oppositeTransaction.open_quantity - remainingQuantity, newOpenQuantity === 0 ? 'closed' : 'open')
           //更新當前交易
-          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position')
+          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', profit)
           remainingQuantity = 0
         }
         /*---------------如果反向交易未平倉量 < 當前交易紀錄的數量-----------------*/
@@ -28,7 +29,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, 0, 'closed')
           //更新當前交易
-          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', transaction.id)
+          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', profit, transaction.id)
           //更新剩餘數量、新增交易紀錄
           remainingQuantity -= oppositeTransaction.open_quantity
           transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description)
@@ -85,10 +87,36 @@ const transactionsServices = {
   },
   getTransactions: async (req, { startDate, endDate }, cb) => {
     const userId = helpers.getUser(req).id
-    const transactions = await db.getTransactionsByDateRange(userId, startDate, endDate)
+    const transactionsArray = await db.getTransactionsByDateRange(userId, startDate, endDate)
+    const win = transactionsArray.filter(t => t.pandl > 1)
+    const loss = transactionsArray.filter(t => t.pandl !== null && t.pandl < 1)
+    const winRate = win.length / (win.length + loss.length)
+    const totalWinPoints = transactionsArray.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
+    const totalLossPoints = transactionsArray.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
+    const profit = totalWinPoints - totalLossPoints
+    const averageWinPoints = Number((totalWinPoints / win.length).toFixed(2))
+    const averageLossPoints = Number((totalLossPoints / loss.length).toFixed(2))
+    const riskRatio = Number((averageWinPoints / averageLossPoints).toFixed(2))
+    const haveOpnePosition = transactionsArray.some(t => t.category === 'opening_position' && t.status === 'open')
+    const roundTrip = transactionsArray.reduce((acc, t) =>
+      t.category === 'closing_position' ? acc + t.quantity : acc, 0)
+    const result = {
+      haveOpnePosition: haveOpnePosition,
+      winCount: win.length,
+      lossCount: loss.length,
+      winRate: winRate,
+      totalWinPoints: totalWinPoints,
+      totalLossPoints: totalLossPoints,
+      profit: profit,
+      roundTrip: roundTrip,
+      averageWinPoints: averageWinPoints,
+      averageLossPoints: averageLossPoints,
+      riskRatio: riskRatio,
+      transactionsArray
+    }
     return cb(null, {
       status: 'success',
-      transactions
+      result
     })
   }
 }

@@ -60,7 +60,17 @@ module.exports = {
     return res.rows[0]
   },
   getTransactionsByDateRange: async (userId, startDate, endDate) => {
-    const res = await pool.query('SELECT * FROM transactions WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3 ORDER BY created_on', [userId, startDate, endDate])
+    const res = await pool.query(`SELECT t.*, json_agg(row_to_json(c_alias)) AS closures
+    FROM transactions t
+    LEFT JOIN (
+    SELECT c.open_transaction_id AS open_transaction_id, c.closed_transaction_id AS closed_transaction_id, c.closed_quantity AS closed_quantity, c.price AS price
+    FROM closures c
+    ) 
+    c_alias ON c_alias.open_transaction_id = t.id
+    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3 
+    
+    GROUP BY t.id
+    ORDER BY t.created_on`, [userId, startDate, endDate])
     return res.rows
   },
   findOppositeOpenTransaction: async (userId, action) => {
@@ -78,11 +88,11 @@ module.exports = {
     )
     return res.rows[0]
   },
-  updateTransactionStatus: async (id, openQuantity, status, category) => {
+  updateTransactionStatus: async (id, openQuantity, status, category, profit) => {
     if (category) {
       await pool.query(
-        `UPDATE transactions SET category = $1, open_quantity = $2, status = $3 WHERE id = $4`,
-        [category, openQuantity, status, id]
+        `UPDATE transactions SET category = $1, open_quantity = $2, status = $3, pandl = $4 WHERE id = $5`,
+        [category, openQuantity, status, profit, id]
       )
     } else {
       await pool.query(
@@ -91,10 +101,10 @@ module.exports = {
       )
     }
   },
-  updateClosingTransaction: async (quantity, category, openQuantity, status, transactionId) => {
+  updateClosingTransaction: async (quantity, category, openQuantity, status, profit, transactionId) => {
     await pool.query(
-      `UPDATE transactions SET quantity = $1, category = $2, open_quantity = $3, status = $4 WHERE id = $5`,
-      [quantity, category, openQuantity, status, transactionId]
+      `UPDATE transactions SET quantity = $1, category = $2, open_quantity = $3, status = $4, pandl = $5 WHERE id = $6`,
+      [quantity, category, openQuantity, status, profit, transactionId]
     )
   }
 }
