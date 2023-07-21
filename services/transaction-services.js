@@ -93,22 +93,24 @@ const transactionsServices = {
     const winRate = win.length / (win.length + loss.length)
     const totalWinPoints = transactionsArray.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
     const totalLossPoints = transactionsArray.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
-    const profit = totalWinPoints - totalLossPoints
+    const pAndL = totalWinPoints - totalLossPoints
     const averageWinPoints = Number((totalWinPoints / win.length).toFixed(2))
     const averageLossPoints = Number((totalLossPoints / loss.length).toFixed(2))
     const riskRatio = Number((averageWinPoints / averageLossPoints).toFixed(2))
     const haveOpnePosition = transactionsArray.some(t => t.category === 'opening_position' && t.status === 'open')
     const roundTrip = transactionsArray.reduce((acc, t) =>
       t.category === 'closing_position' ? acc + t.quantity : acc, 0)
+    const netPAndL = pAndL - roundTrip
     const result = {
       haveOpnePosition: haveOpnePosition,
       winCount: win.length,
       lossCount: loss.length,
-      winRate: winRate,
+      winRate: Number((winRate).toFixed(2)),
       totalWinPoints: totalWinPoints,
       totalLossPoints: totalLossPoints,
-      profit: profit,
+      pAndL: pAndL,
       roundTrip: roundTrip,
+      netPAndL: netPAndL,
       averageWinPoints: averageWinPoints,
       averageLossPoints: averageLossPoints,
       riskRatio: riskRatio,
