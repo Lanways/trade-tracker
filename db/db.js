@@ -117,5 +117,9 @@ module.exports = {
   getPublicTransactions: async () => {
     const res = await pool.query('SELECT * FROM transactions WHERE is_public = true')
     return res.rows
+  },
+  createLike: async (userId, transactionId) => {
+    const res = await pool.query(`INSERT INTO likes (user_id, transaction_id) VALUES($1, $2) RETURNING *`, [userId, transactionId])
+    return res.rows[0]
   }
 }
