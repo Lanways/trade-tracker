@@ -11,7 +11,7 @@ module.exports = async function seedTransactions(pool) {
     for (let userId of res.rows.map(row => row.id)) {
       let transaction_date = new Date()
       try {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 50; i++) {
           const price = Math.floor(Math.random() * 200) + 17800
           const quantity = Math.floor(Math.random() * 9) + 1
           const action = i % 2 === 0 ? 'buy' : 'sell'
