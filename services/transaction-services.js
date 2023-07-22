@@ -12,7 +12,7 @@ const transactionsServices = {
       while (oppositeTransaction && remainingQuantity > 0) {
         /*---------------如果反向交易未平倉量 >= 當前交易紀錄的數量-----------------*/
         if (oppositeTransaction.open_quantity >= remainingQuantity) {
-          newOpenQuantity = oppositeTransaction.open_quantity - remainingQuantity
+          let newOpenQuantity = oppositeTransaction.open_quantity - remainingQuantity
           //建立平倉紀錄
           await db.createClosure(oppositeTransaction.id, transaction.id, quantity, price)
           //更新反向交易
