@@ -157,6 +157,34 @@ const transactionsServices = {
       status: 'success',
       transactions
     })
+  },
+  addLike: async (req, cb) => {
+    try {
+      const userId = helpers.getUser(req).id
+      const transactionId = req.params.id
+      const like = await db.createLike(userId, transactionId)
+      return cb(null, {
+        status: 'success',
+        like
+      })
+    } catch (err) {
+      if (err.code === '23505') return cb('you already liked')
+      return cb(err)
+    }
+  },
+  removeLike: async (req, cb) => {
+    try {
+      const userId = helpers.getUser(req).id
+      const transactionId = req.params.id
+      const removedLike = await db.removeLike(userId, transactionId)
+      if (!removedLike) return cb(`You haven't liked this`)
+      return cb(null, {
+        status: 'success',
+        removedLike
+      })
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
 

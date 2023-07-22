@@ -121,5 +121,9 @@ module.exports = {
   createLike: async (userId, transactionId) => {
     const res = await pool.query(`INSERT INTO likes (user_id, transaction_id) VALUES($1, $2) RETURNING *`, [userId, transactionId])
     return res.rows[0]
+  },
+  removeLike: async (userId, transactionId) => {
+    const res = await pool.query(`DELETE FROM likes WHERE user_id = $1 AND transaction_id = $2  RETURNING *`, [userId, transactionId])
+    return res.rows[0]
   }
 }

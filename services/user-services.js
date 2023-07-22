@@ -68,20 +68,6 @@ const userServices = {
       cb(err)
     }
   },
-  addLike: async (req, cb) => {
-    try {
-      const userId = helpers.getUser(req).id
-      const transactionId = req.params.id
-      const like = await db.createLike(userId, transactionId)
-      return cb(null, {
-        status: 'success',
-        like
-      })
-    } catch (err) {
-      if (err.code === '23505') return cb('you already liked')
-      return cb(err)
-    }
-  }
 }
 
 module.exports = userServices
