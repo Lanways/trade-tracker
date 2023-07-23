@@ -44,6 +44,12 @@ const transactionsController = {
   },
   getPublicTransactions: (req, res, next) => {
     transactionsServices.getPublicTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  addLike: (req, res, next) => {
+    transactionsServices.addLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  removeLike: (req, res, next) => {
+    transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 

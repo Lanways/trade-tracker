@@ -27,7 +27,6 @@ const userController = {
     if (!username) return res.status(400).json({ status: 'error', message: 'username is required' })
     userServices.putUser(req, { username, introduction }, (err, data) => err ? next(err) : res.status(200).json(data))
   }
-
 }
 
 module.exports = userController

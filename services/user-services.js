@@ -67,7 +67,7 @@ const userServices = {
     } catch (err) {
       cb(err)
     }
-  }
+  },
 }
 
 module.exports = userServices
