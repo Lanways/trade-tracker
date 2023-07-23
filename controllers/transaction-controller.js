@@ -1,5 +1,4 @@
 const transactionsServices = require('../services/transaction-services')
-const userServices = require('../services/user-services')
 
 const transactionsController = {
   postTransaction: (req, res, next) => {

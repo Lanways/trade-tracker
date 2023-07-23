@@ -2,8 +2,6 @@ const express = require('express')
 const router = express.Router()
 const { authenticated } = require('../../middleware/api-auth')
 const transactionsController = require('../../controllers/transaction-controller')
-const userServices = require('../../services/user-services')
-const userController = require('../../controllers/user-controller')
 
 router.post('/:id/like', authenticated, transactionsController.addLike)
 router.delete('/:id/unlike', authenticated, transactionsController.removeLike)
