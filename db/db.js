@@ -62,14 +62,13 @@ module.exports = {
     const res = await pool.query(`SELECT t.*, json_agg(row_to_json(c_alias)) AS closures
     FROM transactions t
     LEFT JOIN (
-    SELECT c.open_transaction_id AS open_transaction_id, c.closed_transaction_id AS closed_transaction_id, c.closed_quantity AS closed_quantity, c.price AS price
+    SELECT c.open_transaction_id AS open_transaction_id, c.closed_transaction_id AS closed_transaction_id
     FROM closures c
     ) 
     c_alias ON c_alias.open_transaction_id = t.id
-    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3 
-    
+    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3
     GROUP BY t.id
-    ORDER BY t.created_on`, [userId, startDate, endDate])
+    ORDER BY t.transaction_date`, [userId, startDate, endDate])
     return res.rows
   },
   findOppositeOpenTransaction: async (userId, action) => {
