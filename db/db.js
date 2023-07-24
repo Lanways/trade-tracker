@@ -124,5 +124,15 @@ module.exports = {
   removeLike: async (userId, transactionId) => {
     const res = await pool.query(`DELETE FROM likes WHERE user_id = $1 AND transaction_id = $2  RETURNING *`, [userId, transactionId])
     return res.rows[0]
+  },
+  getUserLikes: async (userId) => {
+    const res = await pool.query(`
+    SELECT t.* , l.user_id AS likeowner_user_id
+    FROM likes l
+    LEFT JOIN transactions t ON l.transaction_id = t.id
+    WHERE l.user_id = $1
+    ORDER BY l.created_on DESC
+    `, [userId])
+    return res.rows
   }
 }

@@ -185,7 +185,24 @@ const transactionsServices = {
     } catch (err) {
       return cb(err)
     }
+  },
+  getUserLikes: async (req, cb) => {
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const currentUserLikes = await db.getUserLikes(currentUserId)
+      const userId = req.params.id
+      const userLikesRes = await db.getUserLikes(userId)
+      const userLikes = userLikesRes.map(like => ({
+        ...like,
+        currentUserIsLiked: currentUserLikes.some(t => t.id === like.id)
+      }))
+      return cb(null, {
+        status: 'success',
+        userLikes
+      })
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
-
 module.exports = transactionsServices

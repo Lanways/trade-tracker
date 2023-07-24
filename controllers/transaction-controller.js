@@ -50,6 +50,9 @@ const transactionsController = {
   },
   removeLike: (req, res, next) => {
     transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getUserLikes: (req, res, next) => {
+    transactionsServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 
