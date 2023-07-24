@@ -50,7 +50,18 @@ const transactionsController = {
   },
   removeLike: (req, res, next) => {
     transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  }
+  },
+  postReply: (req, res, next) => {
+    const { content } = req.body
+    if (!content) return res.status(400).json({ status: 'error', message: 'content is required!' })
+    transactionsServices.postReply(req, content, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  deleteReply: (req, res, next) => {
+    transactionsServices.deleteReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getReply: (req, res, next) => {
+    transactionsServices.getReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
 }
 
 module.exports = transactionsController
