@@ -185,7 +185,46 @@ const transactionsServices = {
     } catch (err) {
       return cb(err)
     }
-  }
+  },
+  postReply: async (req, content, cb) => {
+    try {
+      const userId = helpers.getUser(req).id
+      const transactionId = req.params.id
+      const reply = await db.postReply(userId, transactionId, content)
+      return cb(null, {
+        status: 'success',
+        reply
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  deleteReply: async (req, cb) => {
+    try {
+      const replyId = req.params.id
+      const deleteReply = await db.deleteReply(replyId)
+      if (!deleteReply) return cb('The reply dose not exist.')
+      return cb(null, {
+        status: 'success',
+        deleteReply
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  getReply: async (req, cb) => {
+    try {
+      const transactionId = req.params.id
+      const replies = await db.getReply(transactionId)
+      if (!replies) return cb('There are no replies.')
+      return cb(null, {
+        status: 'success',
+        replies
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
 }
 
 module.exports = transactionsServices
