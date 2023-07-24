@@ -152,7 +152,8 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const transactions = await db.getPublicTransactions()
+    const currentUserId = helpers.getUser(req).id
+    const transactions = await db.getPublicTransactions(currentUserId)
     return cb(null, {
       status: 'success',
       transactions
