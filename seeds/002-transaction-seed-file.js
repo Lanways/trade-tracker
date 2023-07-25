@@ -11,13 +11,13 @@ module.exports = async function seedTransactions(pool) {
     for (let userId of res.rows.map(row => row.id)) {
       let transaction_date = new Date()
       try {
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 100; i++) {
           const price = Math.floor(Math.random() * 200) + 17800
           const quantity = Math.floor(Math.random() * 9) + 1
           const action = i % 2 === 0 ? 'buy' : 'sell'
           const description = faker.lorem.sentence()
           const ispublic = i % 2 === 0 ? true : false
-          transaction_date.setDate(transaction_date.getDate() + Math.floor(Math.random() * 2) + 1)
+          transaction_date.setHours(transaction_date.getHours() + Math.floor(Math.random() * 3) + 2)
           try {
             let remainingQuantity = quantity
             let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, ispublic)
@@ -32,8 +32,8 @@ module.exports = async function seedTransactions(pool) {
                 //更新反向交易
                 await db.updateTransactionStatus(oppositeTransaction.id, oppositeTransaction.open_quantity - remainingQuantity, newOpenQuantity === 0 ? 'closed' : 'open')
                 //更新當前交易
-                const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-                await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', profit)
+                const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+                await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', pandl)
                 remainingQuantity = 0
               }
               /*---------------如果反向交易未平倉量 < 當前交易紀錄的數量-----------------*/
@@ -43,8 +43,8 @@ module.exports = async function seedTransactions(pool) {
                 //更新反向交易
                 await db.updateTransactionStatus(oppositeTransaction.id, 0, 'closed')
                 //更新當前交易
-                const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-                await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', profit, transaction.id)
+                const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+                await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', pandl, transaction.id)
                 //更新剩餘數量、新增交易紀錄
                 remainingQuantity -= oppositeTransaction.open_quantity
                 transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description, ispublic)
@@ -54,11 +54,6 @@ module.exports = async function seedTransactions(pool) {
           } catch (err) {
             console.log(err)
           }
-          //   await pool.query(
-          //     `INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, created_on, updated_on)
-          // VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-          //     [userId, i % 2 === 0 ? 'buy' : 'sell', quantity, price, `Description for transaction ${i}`]
-          //   )
         }
       } catch (err) {
         console.error(`Error: ${err.message}`)
