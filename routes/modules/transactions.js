@@ -9,6 +9,7 @@ router.get('/:id/replies', authenticated, transactionsController.getReplies)
 
 router.post('/:id/like', authenticated, transactionsController.addLike)
 router.delete('/:id/unlike', authenticated, transactionsController.removeLike)
+router.get('/:id/likes', authenticated, transactionsController.getUserLikes)
 router.post('/publics/:id', authenticated, transactionsController.postPublic)
 router.delete('/publics/:id', authenticated, transactionsController.deletePublic)
 router.post('/range', authenticated, transactionsController.getTransactions)

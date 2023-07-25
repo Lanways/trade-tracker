@@ -51,6 +51,9 @@ const transactionsController = {
   removeLike: (req, res, next) => {
     transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getUserLikes: (req, res, next) => {
+    transactionsServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
   postReply: (req, res, next) => {
     const { content } = req.body
     if (!content) return res.status(400).json({ status: 'error', message: 'content is required!' })
