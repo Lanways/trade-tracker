@@ -152,7 +152,8 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const transactions = await db.getPublicTransactions()
+    const currentUserId = helpers.getUser(req).id
+    const transactions = await db.getPublicTransactions(currentUserId)
     return cb(null, {
       status: 'success',
       transactions
@@ -200,9 +201,50 @@ const transactionsServices = {
         status: 'success',
         userLikes
       })
+      } catch (err) {
+      return cb(err)
+     }
+    },
+postReply: async (req, content, cb) => {
+    try {
+      const userId = helpers.getUser(req).id
+      const transactionId = req.params.id
+      const transactionExists = await db.transactionExists(transactionId)
+      if (!transactionExists) return cb(`The transaction dose not exist.`)
+      const reply = await db.postReply(userId, transactionId, content)
+      return cb(null, {
+        status: 'success',
+        reply
+      })
     } catch (err) {
       return cb(err)
     }
-  }
+  },
+  deleteReply: async (req, cb) => {
+    try {
+      const replyId = req.params.id
+      const deleteReply = await db.deleteReply(replyId)
+      if (!deleteReply) return cb('The reply dose not exist.')
+      return cb(null, {
+        status: 'success',
+        deleteReply
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  getReplies: async (req, cb) => {
+    try {
+      const transactionId = req.params.id
+      const replies = await db.getReplies(transactionId)
+      if (!replies) return cb('There are no replies.')
+      return cb(null, {
+        status: 'success',
+        replies
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
 }
 module.exports = transactionsServices
