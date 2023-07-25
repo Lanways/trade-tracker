@@ -113,8 +113,21 @@ module.exports = {
     const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
-  getPublicTransactions: async () => {
-    const res = await pool.query('SELECT * FROM transactions WHERE is_public = true')
+  getPublicTransactions: async (currentUserId) => {
+    const res = await pool.query(`
+    SELECT t.*, 
+            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+            u.avatar AS transaction_user_avatar,
+            u.username AS transaction_user_name,
+            u.account AS transaction_user_account,
+            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+     FROM transactions t
+     LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+     LEFT JOIN users u ON t.user_id = u.id
+     WHERE t.is_public = true
+     ORDER BY t.transaction_date DESC
+    `, [currentUserId])
     return res.rows
   },
   createLike: async (userId, transactionId) => {
@@ -125,6 +138,10 @@ module.exports = {
     const res = await pool.query(`DELETE FROM likes WHERE user_id = $1 AND transaction_id = $2  RETURNING *`, [userId, transactionId])
     return res.rows[0]
   },
+  transactionExists: async (transactionId) => {
+    const res = await pool.query(`SELECT 1 FROM  transactions WHERE id = $1`, [transactionId])
+    return res.rows.length > 0;
+  },
   postReply: async (userId, transactionId, content) => {
     const res = await pool.query('INSERT INTO replies (user_id, transaction_id, content) VALUES ($1, $2, $3) RETURNING *', [userId, transactionId, content])
     return res.rows[0]
@@ -133,8 +150,9 @@ module.exports = {
     const res = await pool.query('DELETE FROM replies WHERE id = $1 RETURNING *', [replyId])
     return res.rows[0]
   },
-  getReply: async (transactionId) => {
+  getReplies: async (transactionId) => {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
-  }
+  },
+
 }

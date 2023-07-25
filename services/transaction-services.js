@@ -152,7 +152,8 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const transactions = await db.getPublicTransactions()
+    const currentUserId = helpers.getUser(req).id
+    const transactions = await db.getPublicTransactions(currentUserId)
     return cb(null, {
       status: 'success',
       transactions
@@ -190,6 +191,8 @@ const transactionsServices = {
     try {
       const userId = helpers.getUser(req).id
       const transactionId = req.params.id
+      const transactionExists = await db.transactionExists(transactionId)
+      if (!transactionExists) return cb(`The transaction dose not exist.`)
       const reply = await db.postReply(userId, transactionId, content)
       return cb(null, {
         status: 'success',
@@ -212,10 +215,10 @@ const transactionsServices = {
       return cb(err)
     }
   },
-  getReply: async (req, cb) => {
+  getReplies: async (req, cb) => {
     try {
       const transactionId = req.params.id
-      const replies = await db.getReply(transactionId)
+      const replies = await db.getReplies(transactionId)
       if (!replies) return cb('There are no replies.')
       return cb(null, {
         status: 'success',

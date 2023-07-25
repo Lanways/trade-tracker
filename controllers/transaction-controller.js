@@ -59,8 +59,8 @@ const transactionsController = {
   deleteReply: (req, res, next) => {
     transactionsServices.deleteReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getReply: (req, res, next) => {
-    transactionsServices.getReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  getReplies: (req, res, next) => {
+    transactionsServices.getReplies(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
 }
 
