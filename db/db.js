@@ -126,7 +126,7 @@ module.exports = {
      LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
      LEFT JOIN users u ON t.user_id = u.id
      WHERE t.is_public = true
-     ORDER BY l.created_on DESC
+     ORDER BY t.transaction_date DESC
     `, [currentUserId])
     return res.rows
   },
