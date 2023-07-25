@@ -2,11 +2,11 @@ const db = require('../db/db')
 const helpers = require('../_helpers')
 
 const transactionsServices = {
-  postTransaction: async (req, { action, quantity, price, transaction_date, description }, cb) => {
+  postTransaction: async (req, { action, quantity, price, transaction_date, description, ispublic }, cb) => {
     try {
       const userId = helpers.getUser(req).id
       let remainingQuantity = quantity
-      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description,)
+      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, ispublic)
       //找反向交易
       let oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
       while (oppositeTransaction && remainingQuantity > 0) {

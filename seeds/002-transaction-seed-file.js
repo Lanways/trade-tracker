@@ -16,10 +16,11 @@ module.exports = async function seedTransactions(pool) {
           const quantity = Math.floor(Math.random() * 9) + 1
           const action = i % 2 === 0 ? 'buy' : 'sell'
           const description = faker.lorem.sentence()
+          const ispublic = i % 2 === 0 ? true : false
           transaction_date.setDate(transaction_date.getDate() + Math.floor(Math.random() * 2) + 1)
           try {
             let remainingQuantity = quantity
-            let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description,)
+            let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, ispublic)
             //找反向交易
             let oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
             while (oppositeTransaction && remainingQuantity > 0) {
@@ -46,7 +47,7 @@ module.exports = async function seedTransactions(pool) {
                 await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', profit, transaction.id)
                 //更新剩餘數量、新增交易紀錄
                 remainingQuantity -= oppositeTransaction.open_quantity
-                transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description)
+                transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description, ispublic)
                 oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
               }
             }

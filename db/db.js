@@ -38,11 +38,11 @@ module.exports = {
     const updatedUserRes = await pool.query('UPDATE users SET username = $1, introduction = $2, avatar = $3, updated_on = NOW() WHERE id = $4 RETURNING *', [username, introduction, avatarPath, userId])
     return updatedUserRes.rows[0]
   },
-  createTransaction: async (user_id, action, quantity, price, transaction_date, description) => {
+  createTransaction: async (user_id, action, quantity, price, transaction_date, description, ispublic) => {
     const openQuantity = quantity
     const res = await pool.query(
-      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [user_id, action, quantity, price, transaction_date, description, openQuantity]
+      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, is_public, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [user_id, action, quantity, price, transaction_date, description, ispublic, openQuantity]
     )
     return res.rows[0]
   },
