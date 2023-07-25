@@ -116,10 +116,16 @@ module.exports = {
   getPublicTransactions: async (currentUserId) => {
     const res = await pool.query(`
     SELECT t.*, 
-            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked
+            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+            u.username AS transaction_user_name,
+            u.account AS transaction_user_account,
+            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
      FROM transactions t
      LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
-     WHERE t.is_public = true;
+     LEFT JOIN users u ON t.user_id = u.id
+     WHERE t.is_public = true
+     ORDER BY l.created_on DESC
     `, [currentUserId])
     return res.rows
   },
@@ -131,6 +137,10 @@ module.exports = {
     const res = await pool.query(`DELETE FROM likes WHERE user_id = $1 AND transaction_id = $2  RETURNING *`, [userId, transactionId])
     return res.rows[0]
   },
+  transactionExists: async (transactionId) => {
+    const res = await pool.query(`SELECT 1 FROM  transactions WHERE id = $1`, [transactionId])
+    return res.rows.length > 0;
+  },
   postReply: async (userId, transactionId, content) => {
     const res = await pool.query('INSERT INTO replies (user_id, transaction_id, content) VALUES ($1, $2, $3) RETURNING *', [userId, transactionId, content])
     return res.rows[0]
@@ -139,7 +149,7 @@ module.exports = {
     const res = await pool.query('DELETE FROM replies WHERE id = $1 RETURNING *', [replyId])
     return res.rows[0]
   },
-  getReply: async (transactionId) => {
+  getReplies: async (transactionId) => {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
   },
