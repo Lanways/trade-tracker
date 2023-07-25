@@ -115,18 +115,23 @@ module.exports = {
   },
   getPublicTransactions: async (currentUserId) => {
     const res = await pool.query(`
-    SELECT t.*, 
-            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
-            u.avatar AS transaction_user_avatar,
-            u.username AS transaction_user_name,
-            u.account AS transaction_user_account,
-            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
-            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
-     FROM transactions t
-     LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
-     LEFT JOIN users u ON t.user_id = u.id
-     WHERE t.is_public = true
-     ORDER BY t.transaction_date DESC
+    SELECT *
+FROM (
+  SELECT DISTINCT ON (t.id) 
+      t.*,
+      CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+      u.avatar AS transaction_user_avatar,
+      u.username AS transaction_user_name,
+      u.account AS transaction_user_account,
+      (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+      (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+  FROM transactions t
+  LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+  LEFT JOIN users u ON t.user_id = u.id
+  WHERE t.is_public = true
+  ORDER BY t.id
+) AS subQuery
+ORDER BY transaction_date DESC;
     `, [currentUserId])
     return res.rows
   },
