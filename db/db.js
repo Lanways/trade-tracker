@@ -117,6 +117,7 @@ module.exports = {
     const res = await pool.query(`
     SELECT t.*, 
             CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+            u.avatar AS transaction_user_avatar,
             u.username AS transaction_user_name,
             u.account AS transaction_user_account,
             (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
