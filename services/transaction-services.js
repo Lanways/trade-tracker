@@ -225,6 +225,21 @@ const transactionsServices = {
       return cb(err)
     }
   },
+  getTopUsers: async (req, cb) => {
+    const topUsers = await db.getTopUsers()
+    // const win = transactionsArray.filter(t => t.pandl > 1)
+    // const loss = transactionsArray.filter(t => t.pandl !== null && t.pandl < 1)
+    // const winRate = win.length / (win.length + loss.length)
+    const res = topUsers.map(user => {
+      const win = user.transactions.filter(t => t.pandl > 1)
+      const loss = user.transactions.filter(t => t.pandl !== null && t.pandl < 1)
+      const winRate = win.length / (win.length + loss.length)
+    })
+    return cb(null, {
+      status: 'success',
+      topUsers
+    })
+  }
 }
 
 module.exports = transactionsServices

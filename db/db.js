@@ -136,5 +136,14 @@ module.exports = {
   getReply: async (transactionId) => {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
+  },
+  getTopUsers: async () => {
+    const res = await pool.query(`
+      SELECT u.id, u.username, u.account, json_agg(t) AS transactions
+      FROM users u
+      LEFT JOIN transactions t ON u.id = t.user_id
+      GROUP BY u.id
+    `)
+    return res.rows
   }
 }

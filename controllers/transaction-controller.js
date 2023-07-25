@@ -62,6 +62,9 @@ const transactionsController = {
   getReply: (req, res, next) => {
     transactionsServices.getReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getTopUsers: (req, res, next) => {
+    transactionsServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  }
 }
 
 module.exports = transactionsController
