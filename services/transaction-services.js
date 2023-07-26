@@ -1,5 +1,6 @@
 const db = require('../db/db')
 const helpers = require('../_helpers')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const transactionsServices = {
   postTransaction: async (req, { action, quantity, price, transaction_date, description, ispublic }, cb) => {
@@ -152,12 +153,21 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const currentUserId = helpers.getUser(req).id
-    const transactions = await db.getPublicTransactions(currentUserId)
-    return cb(null, {
-      status: 'success',
-      transactions
-    })
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const page = Number(req.query.page) || 1
+      const limit = Number(req.query.limit) || 20
+      const offset = getOffset(limit, page)
+      const result = await db.getPublicTransactions(currentUserId, limit, offset)
+      const pagination = getPagination(limit, page, result.count)
+      return cb(null, {
+        status: 'success',
+        pagination: pagination,
+        transactions: result.transactions
+      })
+    } catch (err) {
+      return cb(err)
+    }
   },
   addLike: async (req, cb) => {
     try {
@@ -201,11 +211,11 @@ const transactionsServices = {
         status: 'success',
         userLikes
       })
-      } catch (err) {
+    } catch (err) {
       return cb(err)
-     }
-    },
-postReply: async (req, content, cb) => {
+    }
+  },
+  postReply: async (req, content, cb) => {
     try {
       const userId = helpers.getUser(req).id
       const transactionId = req.params.id

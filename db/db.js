@@ -113,8 +113,8 @@ module.exports = {
     const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
-  getPublicTransactions: async (currentUserId) => {
-    const res = await pool.query(`
+  getPublicTransactions: async (currentUserId, limit, offset) => {
+    const transactionsRes = await pool.query(`
     SELECT t.*, 
             CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
             u.avatar AS transaction_user_avatar,
@@ -127,8 +127,17 @@ module.exports = {
      LEFT JOIN users u ON t.user_id = u.id
      WHERE t.is_public = true
      ORDER BY t.transaction_date DESC
-    `, [currentUserId])
-    return res.rows
+     LIMIT $2 OFFSET $3
+    `, [currentUserId, limit, offset])
+    const countRes = await pool.query(`
+      SELECT COUNT(*)
+      FROM transactions t
+      WHERE t.is_public = true
+    `)
+    return {
+      transactions: transactionsRes.rows,
+      count: countRes.rows[0].count
+    }
   },
   createLike: async (userId, transactionId) => {
     const res = await pool.query(`INSERT INTO likes (user_id, transaction_id) VALUES($1, $2) RETURNING *`, [userId, transactionId])
@@ -163,5 +172,5 @@ module.exports = {
   getReplies: async (transactionId) => {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
-  }
+  },
 }
