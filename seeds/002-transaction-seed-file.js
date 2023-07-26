@@ -9,7 +9,7 @@ module.exports = async function seedTransactions(pool) {
 
   if (count === 0) {
     for (let userId of res.rows.map(row => row.id)) {
-      let transaction_date = new Date()
+      let transaction_date = new Date(2023, 6, 1)
       try {
         for (let i = 0; i < 100; i++) {
           const price = Math.floor(Math.random() * 200) + 17800
