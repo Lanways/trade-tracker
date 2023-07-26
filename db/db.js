@@ -178,7 +178,8 @@ module.exports = {
       ORDER BY win_rate DESC
       LIMIT 10
     `)
-    },
+    return res.rows
+  },
   getDailyTransactions: async (userId) => {
     const res = await pool.query(`
     SELECT DATE(transaction_date) AS date,
