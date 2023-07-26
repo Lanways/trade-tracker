@@ -38,11 +38,11 @@ module.exports = {
     const updatedUserRes = await pool.query('UPDATE users SET username = $1, introduction = $2, avatar = $3, updated_on = NOW() WHERE id = $4 RETURNING *', [username, introduction, avatarPath, userId])
     return updatedUserRes.rows[0]
   },
-  createTransaction: async (user_id, action, quantity, price, transaction_date, description) => {
+  createTransaction: async (user_id, action, quantity, price, transaction_date, description, ispublic) => {
     const openQuantity = quantity
     const res = await pool.query(
-      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [user_id, action, quantity, price, transaction_date, description, openQuantity]
+      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, is_public, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [user_id, action, quantity, price, transaction_date, description, ispublic, openQuantity]
     )
     return res.rows[0]
   },
@@ -86,11 +86,11 @@ module.exports = {
     )
     return res.rows[0]
   },
-  updateTransactionStatus: async (id, openQuantity, status, category, profit) => {
+  updateTransactionStatus: async (id, openQuantity, status, category, pandl) => {
     if (category) {
       await pool.query(
         `UPDATE transactions SET category = $1, open_quantity = $2, status = $3, pandl = $4 WHERE id = $5`,
-        [category, openQuantity, status, profit, id]
+        [category, openQuantity, status, pandl, id]
       )
     } else {
       await pool.query(
@@ -99,10 +99,10 @@ module.exports = {
       )
     }
   },
-  updateClosingTransaction: async (quantity, category, openQuantity, status, profit, transactionId) => {
+  updateClosingTransaction: async (quantity, category, openQuantity, status, pandl, transactionId) => {
     await pool.query(
       `UPDATE transactions SET quantity = $1, category = $2, open_quantity = $3, status = $4, pandl = $5 WHERE id = $6`,
-      [quantity, category, openQuantity, status, profit, transactionId]
+      [quantity, category, openQuantity, status, pandl, transactionId]
     )
   },
   changePublic: async (newPublicValue, transactionId) => {
@@ -113,8 +113,21 @@ module.exports = {
     const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
-  getPublicTransactions: async () => {
-    const res = await pool.query('SELECT * FROM transactions WHERE is_public = true')
+  getPublicTransactions: async (currentUserId) => {
+    const res = await pool.query(`
+    SELECT t.*, 
+            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+            u.avatar AS transaction_user_avatar,
+            u.username AS transaction_user_name,
+            u.account AS transaction_user_account,
+            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+     FROM transactions t
+     LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+     LEFT JOIN users u ON t.user_id = u.id
+     WHERE t.is_public = true
+     ORDER BY t.transaction_date DESC
+    `, [currentUserId])
     return res.rows
   },
   createLike: async (userId, transactionId) => {
@@ -125,6 +138,20 @@ module.exports = {
     const res = await pool.query(`DELETE FROM likes WHERE user_id = $1 AND transaction_id = $2  RETURNING *`, [userId, transactionId])
     return res.rows[0]
   },
+  getUserLikes: async (userId) => {
+    const res = await pool.query(`
+    SELECT t.* , l.user_id AS likeowner_user_id
+    FROM likes l
+    LEFT JOIN transactions t ON l.transaction_id = t.id
+    WHERE l.user_id = $1
+    ORDER BY l.created_on DESC
+    `, [userId])
+    return res.rows
+  },
+  transactionExists: async (transactionId) => {
+    const res = await pool.query(`SELECT 1 FROM  transactions WHERE id = $1`, [transactionId])
+    return res.rows.length > 0;
+  },
   postReply: async (userId, transactionId, content) => {
     const res = await pool.query('INSERT INTO replies (user_id, transaction_id, content) VALUES ($1, $2, $3) RETURNING *', [userId, transactionId, content])
     return res.rows[0]
@@ -133,7 +160,7 @@ module.exports = {
     const res = await pool.query('DELETE FROM replies WHERE id = $1 RETURNING *', [replyId])
     return res.rows[0]
   },
-  getReply: async (transactionId) => {
+  getReplies: async (transactionId) => {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
   },
@@ -151,6 +178,35 @@ module.exports = {
       ORDER BY win_rate DESC
       LIMIT 10
     `)
+    },
+  getDailyTransactions: async (userId) => {
+    const res = await pool.query(`
+    SELECT DATE(transaction_date) AS date,
+      SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) AS win_count,
+      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END) AS loss_count,
+      CAST(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END)AS DECIMAL) /
+      (SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
+      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)) AS win_rate,
+      COALESCE(
+          ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)),
+       0) AS average_win,
+      COALESCE(
+          ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)),
+       0) AS average_loss,
+      COALESCE(
+          (COALESCE(ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)), 0)) /
+          NULLIF((COALESCE(ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS  DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
+      999999999) AS risk_ratio,
+      SUM(pandl) AS total_pandl
+    FROM transactions
+    WHERE user_id = $1
+    GROUP BY DATE(transaction_date)
+    ORDER BY date DESC
+    `, [userId])
     return res.rows
   }
 }

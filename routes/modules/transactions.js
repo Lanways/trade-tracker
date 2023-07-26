@@ -5,13 +5,14 @@ const transactionsController = require('../../controllers/transaction-controller
 
 router.post('/:id/replies', authenticated, transactionsController.postReply)
 router.delete('/:id/deleteReplies', authenticated, transactionsController.deleteReply)
-router.get('/:id/replies', authenticated, transactionsController.getReply)
-
+router.get('/:id/replies', authenticated, transactionsController.getReplies)
 router.post('/:id/like', authenticated, transactionsController.addLike)
 router.delete('/:id/unlike', authenticated, transactionsController.removeLike)
+router.get('/:id/likes', authenticated, transactionsController.getUserLikes)
 router.post('/publics/:id', authenticated, transactionsController.postPublic)
 router.delete('/publics/:id', authenticated, transactionsController.deletePublic)
 router.get('/top', authenticated, transactionsController.getTopUsers)
+router.get('/:id/daily', authenticated, transactionsController.getDailyTransactions)
 router.post('/range', authenticated, transactionsController.getTransactions)
 router.get('/publics', authenticated, transactionsController.getPublicTransactions)
 router.get('/:id', authenticated, transactionsController.getTransaction)

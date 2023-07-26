@@ -2,11 +2,11 @@ const db = require('../db/db')
 const helpers = require('../_helpers')
 
 const transactionsServices = {
-  postTransaction: async (req, { action, quantity, price, transaction_date, description }, cb) => {
+  postTransaction: async (req, { action, quantity, price, transaction_date, description, ispublic }, cb) => {
     try {
       const userId = helpers.getUser(req).id
       let remainingQuantity = quantity
-      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description,)
+      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, ispublic)
       //找反向交易
       let oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
       while (oppositeTransaction && remainingQuantity > 0) {
@@ -18,8 +18,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, oppositeTransaction.open_quantity - remainingQuantity, newOpenQuantity === 0 ? 'closed' : 'open')
           //更新當前交易
-          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', profit)
+          const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', pandl)
           remainingQuantity = 0
         }
         /*---------------如果反向交易未平倉量 < 當前交易紀錄的數量-----------------*/
@@ -29,8 +29,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, 0, 'closed')
           //更新當前交易
-          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', profit, transaction.id)
+          const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', pandl, transaction.id)
           //更新剩餘數量、新增交易紀錄
           remainingQuantity -= oppositeTransaction.open_quantity
           transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description)
@@ -152,7 +152,8 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const transactions = await db.getPublicTransactions()
+    const currentUserId = helpers.getUser(req).id
+    const transactions = await db.getPublicTransactions(currentUserId)
     return cb(null, {
       status: 'success',
       transactions
@@ -186,10 +187,30 @@ const transactionsServices = {
       return cb(err)
     }
   },
+  getUserLikes: async (req, cb) => {
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const currentUserLikes = await db.getUserLikes(currentUserId)
+      const userId = req.params.id
+      const userLikesRes = await db.getUserLikes(userId)
+      const userLikes = userLikesRes.map(like => ({
+        ...like,
+        currentUserIsLiked: currentUserLikes.some(t => t.id === like.id)
+      }))
+      return cb(null, {
+        status: 'success',
+        userLikes
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
   postReply: async (req, content, cb) => {
     try {
       const userId = helpers.getUser(req).id
       const transactionId = req.params.id
+      const transactionExists = await db.transactionExists(transactionId)
+      if (!transactionExists) return cb(`The transaction dose not exist.`)
       const reply = await db.postReply(userId, transactionId, content)
       return cb(null, {
         status: 'success',
@@ -212,10 +233,10 @@ const transactionsServices = {
       return cb(err)
     }
   },
-  getReply: async (req, cb) => {
+  getReplies: async (req, cb) => {
     try {
       const transactionId = req.params.id
-      const replies = await db.getReply(transactionId)
+      const replies = await db.getReplies(transactionId)
       if (!replies) return cb('There are no replies.')
       return cb(null, {
         status: 'success',
@@ -235,7 +256,14 @@ const transactionsServices = {
     } catch (err) {
       return cb(err)
     }
+  },
+  getDailyTransactions: async (req, cb) => {
+    const userId = req.params.id
+    const dailyTransactions = await db.getDailyTransactions(userId)
+    return cb(null, {
+      status: 'success',
+      dailyTransactions
+    })
   }
 }
-
 module.exports = transactionsServices

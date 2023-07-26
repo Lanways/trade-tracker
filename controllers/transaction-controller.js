@@ -2,14 +2,14 @@ const transactionsServices = require('../services/transaction-services')
 
 const transactionsController = {
   postTransaction: (req, res, next) => {
-    const { action, quantity, price, transaction_date, description } = req.body
+    const { action, quantity, price, transaction_date, description, ispublic } = req.body
     if (!['buy', 'sell'].includes(action)) return res.status(400).json({ status: 'error', message: 'please input buy or sell!' })
     if (!quantity) return res.status(400).json({ status: 'error', message: 'quantity is required!' })
     if (!price) return res.status(400).json({ status: 'error', message: 'price is required!' })
     if (!transaction_date) return res.status(400).json({ status: 'error', message: 'transacton_date is required!' })
     if (description.length > 200) return res.status(400).json({ status: 'error', message: `The character count can't excced 200` })
 
-    transactionsServices.postTransaction(req, { action, quantity, price, transaction_date, description }, (err, data) => err ? next(err) : res.status(200).json(data))
+    transactionsServices.postTransaction(req, { action, quantity, price, transaction_date, description, ispublic }, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   getTransaction: (req, res, next) => {
     const transactionId = req.params.id
@@ -51,6 +51,9 @@ const transactionsController = {
   removeLike: (req, res, next) => {
     transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getUserLikes: (req, res, next) => {
+    transactionsServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
   postReply: (req, res, next) => {
     const { content } = req.body
     if (!content) return res.status(400).json({ status: 'error', message: 'content is required!' })
@@ -59,11 +62,14 @@ const transactionsController = {
   deleteReply: (req, res, next) => {
     transactionsServices.deleteReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getReply: (req, res, next) => {
-    transactionsServices.getReply(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  getReplies: (req, res, next) => {
+    transactionsServices.getReplies(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   getTopUsers: (req, res, next) => {
     transactionsServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getDailyTransactions: (req, res, next) => {
+    transactionsServices.getDailyTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 

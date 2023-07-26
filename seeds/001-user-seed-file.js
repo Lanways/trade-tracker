@@ -6,7 +6,7 @@ module.exports = async function seedUsers(pool) {
   console.log('user table count =', count)
 
   if (count === 0) {
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 20; i++) {
       let username = `user${i}`
       let account = `account${i}`
       let password = await bcrypt.hash('12345', 10)
