@@ -139,10 +139,17 @@ module.exports = {
   },
   getTopUsers: async () => {
     const res = await pool.query(`
-      SELECT u.id, u.username, u.account, json_agg(t) AS transactions
-      FROM users u
-      LEFT JOIN transactions t ON u.id = t.user_id
-      GROUP BY u.id
+      SELECT users.id AS user_id, username, account, avatar,
+        SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) as win_count,
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END) as loss_count,
+        CAST(SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) AS DECIMAL) /
+        (SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)) as win_rate
+      FROM users
+      LEFT JOIN transactions t ON t.user_id = users.id      
+      GROUP BY users.id
+      ORDER BY win_rate DESC
+      LIMIT 10
     `)
     return res.rows
   }
