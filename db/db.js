@@ -164,6 +164,21 @@ module.exports = {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
   },
+  getTopUsers: async () => {
+    const res = await pool.query(`
+      SELECT users.id AS user_id, username, account, avatar,
+        SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) as win_count,
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END) as loss_count,
+        CAST(SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) AS DECIMAL) /
+        (SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)) as win_rate
+      FROM users
+      LEFT JOIN transactions t ON t.user_id = users.id      
+      GROUP BY users.id
+      ORDER BY win_rate DESC
+      LIMIT 10
+    `)
+    },
   getDailyTransactions: async (userId) => {
     const res = await pool.query(`
     SELECT DATE(transaction_date) AS date,
@@ -194,5 +209,4 @@ module.exports = {
     `, [userId])
     return res.rows
   }
-
 }
