@@ -86,11 +86,11 @@ module.exports = {
     )
     return res.rows[0]
   },
-  updateTransactionStatus: async (id, openQuantity, status, category, profit) => {
+  updateTransactionStatus: async (id, openQuantity, status, category, pandl) => {
     if (category) {
       await pool.query(
         `UPDATE transactions SET category = $1, open_quantity = $2, status = $3, pandl = $4 WHERE id = $5`,
-        [category, openQuantity, status, profit, id]
+        [category, openQuantity, status, pandl, id]
       )
     } else {
       await pool.query(
@@ -99,10 +99,10 @@ module.exports = {
       )
     }
   },
-  updateClosingTransaction: async (quantity, category, openQuantity, status, profit, transactionId) => {
+  updateClosingTransaction: async (quantity, category, openQuantity, status, pandl, transactionId) => {
     await pool.query(
       `UPDATE transactions SET quantity = $1, category = $2, open_quantity = $3, status = $4, pandl = $5 WHERE id = $6`,
-      [quantity, category, openQuantity, status, profit, transactionId]
+      [quantity, category, openQuantity, status, pandl, transactionId]
     )
   },
   changePublic: async (newPublicValue, transactionId) => {
@@ -173,4 +173,49 @@ module.exports = {
     const res = await pool.query('SELECT * FROM replies WHERE transaction_id = $1', [transactionId])
     return res.rows
   },
+  getTopUsers: async () => {
+    const res = await pool.query(`
+      SELECT users.id AS user_id, username, account, avatar,
+        SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) as win_count,
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END) as loss_count,
+        CAST(SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) AS DECIMAL) /
+        (SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)) as win_rate
+      FROM users
+      LEFT JOIN transactions t ON t.user_id = users.id      
+      GROUP BY users.id
+      ORDER BY win_rate DESC
+      LIMIT 10
+    `)
+    },
+  getDailyTransactions: async (userId) => {
+    const res = await pool.query(`
+    SELECT DATE(transaction_date) AS date,
+      SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) AS win_count,
+      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END) AS loss_count,
+      CAST(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END)AS DECIMAL) /
+      (SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
+      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)) AS win_rate,
+      COALESCE(
+          ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)),
+       0) AS average_win,
+      COALESCE(
+          ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)),
+       0) AS average_loss,
+      COALESCE(
+          (COALESCE(ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)), 0)) /
+          NULLIF((COALESCE(ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS  DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
+      999999999) AS risk_ratio,
+      SUM(pandl) AS total_pandl
+    FROM transactions
+    WHERE user_id = $1
+    GROUP BY DATE(transaction_date)
+    ORDER BY date DESC
+    `, [userId])
+    return res.rows
+  }
 }
