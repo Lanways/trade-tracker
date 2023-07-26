@@ -18,8 +18,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, oppositeTransaction.open_quantity - remainingQuantity, newOpenQuantity === 0 ? 'closed' : 'open')
           //更新當前交易
-          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', profit)
+          const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateTransactionStatus(transaction.id, 0, 'closed', 'closing_position', pandl)
           remainingQuantity = 0
         }
         /*---------------如果反向交易未平倉量 < 當前交易紀錄的數量-----------------*/
@@ -29,8 +29,8 @@ const transactionsServices = {
           //更新反向交易
           await db.updateTransactionStatus(oppositeTransaction.id, 0, 'closed')
           //更新當前交易
-          const profit = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
-          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', profit, transaction.id)
+          const pandl = oppositeTransaction.action === 'buy' ? transaction.price - oppositeTransaction.price : oppositeTransaction.price - transaction.price
+          await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', pandl, transaction.id)
           //更新剩餘數量、新增交易紀錄
           remainingQuantity -= oppositeTransaction.open_quantity
           transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description)
@@ -201,11 +201,11 @@ const transactionsServices = {
         status: 'success',
         userLikes
       })
-      } catch (err) {
+    } catch (err) {
       return cb(err)
-     }
-    },
-postReply: async (req, content, cb) => {
+    }
+  },
+  postReply: async (req, content, cb) => {
     try {
       const userId = helpers.getUser(req).id
       const transactionId = req.params.id
@@ -246,5 +246,13 @@ postReply: async (req, content, cb) => {
       return cb(err)
     }
   },
+  getDailyTransactions: async (req, cb) => {
+    const userId = req.params.id
+    const dailyTransactions = await db.getDailyTransactions(userId)
+    return cb(null, {
+      status: 'success',
+      dailyTransactions
+    })
+  }
 }
 module.exports = transactionsServices
