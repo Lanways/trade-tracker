@@ -2,8 +2,9 @@ module.exports = async function seedLikes(pool) {
   const db = require('../db/db')
   const resTransactionsId = await pool.query(`SELECT id FROM transactions`)
   const resUsersId = await pool.query(`SELECT id FROM users ORDER BY RANDOM() LIMIT 10`)
-  const countRes = await pool.query(`SELECT count(*) AS likesCount FROM likes`)
-  const count = countRes.rows[0].likesCount
+  const countRes = await pool.query(`SELECT COUNT(*) FROM likes`)
+  const count = Number(countRes.rows[0].count)
+  console.log('likes table count =', count)
 
   if (count === 0) {
     // 隨機 10 user_id 對遍歷 transaction_id 加入 like
@@ -15,5 +16,7 @@ module.exports = async function seedLikes(pool) {
           console.log(err)
         }
     }
+  } else {
+    console.log('like table is not empty')
   }
 }
