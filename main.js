@@ -20,11 +20,15 @@ if (process.env.NODE_ENV === "production") {
 const setupModels = require('./db/index')
 const seedUsers = require('./seeds/001-user-seed-file')
 const seedTransactions = require('./seeds/002-transaction-seed-file')
+const seedLikes = require('./seeds/003-like-seed-file')
+const seedReplies = require('./seeds/004-replies-seed-file')
 
 async function main() {
   await setupModels(pool)
   await seedUsers(pool)
   await seedTransactions(pool)
+  await seedLikes(pool)
+  await seedReplies(pool)
   pool.end()
 }
 
