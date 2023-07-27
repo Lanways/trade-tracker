@@ -46,8 +46,20 @@ module.exports = {
     )
     return res.rows[0]
   },
-  getTransactionById: async (id) => {
-    const res = await pool.query('SELECT * FROM transactions WHERE id = $1', [id])
+  getTransactionById: async (transactionId, currentUserId) => {
+    const res = await pool.query(`
+    SELECT t.*,
+     CASE WHEN l.user_id = $2 THEN true ELSE false END AS is_like,
+     u.avatar AS transaction_user_avatar,
+     u.username AS transaction_user_name,
+     u.account AS transaction_user_account,
+     (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+     (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+    FROM transactions t
+    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+    LEFT JOIN users u ON t.user_id = u.id
+    WHERE t.id = $1
+    `, [transactionId, currentUserId])
     return res.rows[0]
   },
   putTransactionById: async (action, quantity, price, transaction_date, description, transactionId) => {
@@ -116,18 +128,18 @@ module.exports = {
   getPublicTransactions: async (currentUserId, limit, offset) => {
     const transactionsRes = await pool.query(`
     SELECT t.*, 
-            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
-            u.avatar AS transaction_user_avatar,
-            u.username AS transaction_user_name,
-            u.account AS transaction_user_account,
-            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
-            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
-     FROM transactions t
-     LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
-     LEFT JOIN users u ON t.user_id = u.id
-     WHERE t.is_public = true
-     ORDER BY t.transaction_date DESC
-     LIMIT $2 OFFSET $3
+     CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+     u.avatar AS transaction_user_avatar,
+     u.username AS transaction_user_name,
+     u.account AS transaction_user_account,
+     (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+     (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+    FROM transactions t
+    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+    LEFT JOIN users u ON t.user_id = u.id
+    WHERE t.is_public = true
+    ORDER BY t.transaction_date DESC
+    LIMIT $2 OFFSET $3
     `, [currentUserId, limit, offset])
     const countRes = await pool.query(`
       SELECT COUNT(*)
