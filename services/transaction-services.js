@@ -259,6 +259,40 @@ const transactionsServices = {
     } catch (err) {
       return cb(err)
     }
+  },
+  getTransactionsForTheDay: async (req, cb) => {
+    const userId = req.params.id
+    const date = req.query.date || new Date()
+    const transactions = await db.getTransactionsByDate(userId, date)
+
+    const winCount = transactions.filter(t => t.pandl >= 1).length
+    const lossCount = transactions.filter(t => t.pandl !== null && t.pandl < 1).length
+    const totalWinPoints = transactions.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
+    const totalLossPoints = transactions.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
+    const averageWinPoints = Number((totalWinPoints / winCount).toFixed(2))
+    const averageLossPoints = Number((totalLossPoints / lossCount).toFixed(2))
+
+    const historyData = {
+      haveOpnePosition: transactions.some(t => t.category === 'opening_position' && t.status === 'open'),
+      winCount,
+      lossCount,
+      winRate: Number((winCount / (winCount + lossCount)).toFixed(2)),
+      totalWinPoints,
+      totalLossPoints,
+      pAndL: totalWinPoints - totalLossPoints,
+      roundTrip: transactions.reduce((acc, t) =>
+        t.category === 'closing_position' ? acc + t.quantity : acc, 0),
+      netPAndL: (totalWinPoints - totalLossPoints) - transactions.reduce((acc, t) =>
+        t.category === 'closing_position' ? acc + t.quantity : acc, 0),
+      averageWinPoints,
+      averageLossPoints,
+      riskRatio: Number((averageWinPoints / averageLossPoints).toFixed(2))
+    }
+    return cb(null, {
+      status: 'success',
+      historyData,
+      transactions
+    })
   }
 }
 module.exports = transactionsServices

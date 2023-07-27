@@ -70,7 +70,6 @@ module.exports = {
       query += ` AND t.transaction_date BETWEEN $2 AND $3`
       params.push(startDate, endDate)
     }
-
     query += ` ORDER BY t.transaction_date DESC`
 
     const res = await pool.query(query, params)
@@ -224,5 +223,20 @@ module.exports = {
     query += ` GROUP BY DATE(transaction_date) ORDER BY date ASC`
     const res = await pool.query(query, params)
     return res.rows
-  }
+  },
+  getTransactionsForTheDay: async (userId, date) => {
+    const res = await pool.query(`
+    SELECT * FROM transactions
+    WHERE user_id = $1 AND transaction_date = $2
+    `)
+    return res.rows
+  },
+  getTransactionsByDate: async (userId, date) => {
+    const res = await pool.query(`
+    SELECT *
+    FROM transactions
+    WHERE user_id = $1 AND DATE(transaction_date) = $2
+    `, [userId, date])
+    return res.rows
+  },
 }

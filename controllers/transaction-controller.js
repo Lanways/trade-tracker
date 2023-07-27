@@ -63,6 +63,9 @@ const transactionsController = {
   },
   getHistoryTransactions: (req, res, next) => {
     transactionsServices.getHistoryTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getTransactionsForTheDay: (req, res, next) => {
+    transactionsServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 
