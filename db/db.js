@@ -59,16 +59,21 @@ module.exports = {
     return res.rows[0]
   },
   getTransactionsByDateRange: async (userId, startDate, endDate) => {
-    const res = await pool.query(`SELECT t.*, json_agg(row_to_json(c_alias)) AS closures
+    let query = `
+    SELECT t.*
     FROM transactions t
-    LEFT JOIN (
-    SELECT c.open_transaction_id AS open_transaction_id, c.closed_transaction_id AS closed_transaction_id
-    FROM closures c
-    ) 
-    c_alias ON c_alias.open_transaction_id = t.id
-    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3
-    GROUP BY t.id
-    ORDER BY t.transaction_date`, [userId, startDate, endDate])
+    WHERE t.user_id = $1 
+    `
+    let params = [userId]
+
+    if (startDate && endDate) {
+      query += ` AND t.transaction_date BETWEEN $2 AND $3`
+      params.push(startDate, endDate)
+    }
+
+    query += ` ORDER BY t.transaction_date DESC`
+
+    const res = await pool.query(query, params)
     return res.rows
   },
   findOppositeOpenTransaction: async (userId, action) => {
@@ -180,14 +185,14 @@ module.exports = {
     `)
     return res.rows
   },
-  getDailyTransactions: async (userId) => {
-    const res = await pool.query(`
+  getDailyTransactionsData: async (userId, startDate, endDate) => {
+    let query = `
     SELECT DATE(transaction_date) AS date,
       SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) AS win_count,
       SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END) AS loss_count,
       CAST(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END)AS DECIMAL) /
-      (SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
-      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)) AS win_rate,
+      NULLIF((SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
+      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)), 0) AS win_rate,
       COALESCE(
           CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
           NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0),
@@ -201,13 +206,23 @@ module.exports = {
           NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0), 0)) /
           NULLIF((COALESCE(ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS  DECIMAL) /
           NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
-      999999999) AS risk_ratio,
-      SUM(pandl) AS total_pandl
+      0) AS risk_ratio,
+      SUM(pandl) AS pandl,
+      SUM(SUM(pandl)) OVER (ORDER BY DATE(transaction_date)) AS cumulative_pandl
     FROM transactions
     WHERE user_id = $1
-    GROUP BY DATE(transaction_date)
-    ORDER BY date DESC
-    `, [userId])
+    `
+    let params = [userId]
+    if (startDate) {
+      query += ` AND transaction_date >= $2`
+      params.push(startDate)
+    }
+    if (endDate) {
+      query += ` AND transaction_date <= $3`
+      params.push(endDate)
+    }
+    query += ` GROUP BY DATE(transaction_date) ORDER BY date ASC`
+    const res = await pool.query(query, params)
     return res.rows
   }
 }
