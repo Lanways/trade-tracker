@@ -178,7 +178,8 @@ module.exports = {
       ORDER BY win_rate DESC
       LIMIT 10
     `)
-    },
+    return res.rows
+  },
   getDailyTransactions: async (userId) => {
     const res = await pool.query(`
     SELECT DATE(transaction_date) AS date,
@@ -188,16 +189,16 @@ module.exports = {
       (SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
       SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)) AS win_rate,
       COALESCE(
-          ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)),
+          CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0),
        0) AS average_win,
       COALESCE(
           ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS DECIMAL) /
           NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)),
        0) AS average_loss,
       COALESCE(
-          (COALESCE(ABS(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0)), 0)) /
+          (COALESCE(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0), 0)) /
           NULLIF((COALESCE(ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS  DECIMAL) /
           NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
       999999999) AS risk_ratio,
