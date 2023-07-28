@@ -190,9 +190,11 @@ module.exports = {
       SELECT users.id AS user_id, username, account, avatar,
         SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) as win_count,
         SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END) as loss_count,
+        COALESCE(
         CAST(SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) AS DECIMAL) /
         NULLIF((SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
-        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)), 0) as win_rate
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)), 0),
+        0) as win_rate
       FROM users
       LEFT JOIN transactions t ON t.user_id = users.id      
       GROUP BY users.id
