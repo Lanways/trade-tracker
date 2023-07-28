@@ -43,8 +43,9 @@ const transactionsServices = {
       cb(err)
     }
   },
-  getTransaction: async (req, { transactionId }, cb) => {
-    const transaction = await db.getTransactionById(transactionId)
+  getTransaction: async (req, transactionId, cb) => {
+    const currentUserId = helpers.getUser(req).id
+    const transaction = await db.getTransactionById(transactionId, currentUserId)
     if (!transaction) return cb('Transaction is not exist!')
     return cb(null, {
       status: 'success',
