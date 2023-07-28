@@ -224,13 +224,6 @@ module.exports = {
     const res = await pool.query(query, params)
     return res.rows
   },
-  getTransactionsForTheDay: async (userId, date) => {
-    const res = await pool.query(`
-    SELECT * FROM transactions
-    WHERE user_id = $1 AND transaction_date = $2
-    `)
-    return res.rows
-  },
   getTransactionsByDate: async (userId, date) => {
     const res = await pool.query(`
     SELECT *
