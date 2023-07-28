@@ -56,7 +56,7 @@ module.exports = {
      (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
      (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
     FROM transactions t
-    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $2
     LEFT JOIN users u ON t.user_id = u.id
     WHERE t.id = $1
     `, [transactionId, currentUserId])
