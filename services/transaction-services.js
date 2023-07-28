@@ -293,6 +293,42 @@ const transactionsServices = {
       historyData,
       transactions
     })
-  }
+  },
+  getTransactions: async (req, { startDate, endDate }, cb) => {
+    const userId = helpers.getUser(req).id
+    const transactionsArray = await db.getTransactionsBetweenDates(userId, startDate, endDate)
+    const win = transactionsArray.filter(t => t.pandl > 1)
+    const loss = transactionsArray.filter(t => t.pandl !== null && t.pandl < 1)
+    const winRate = win.length / (win.length + loss.length)
+    const totalWinPoints = transactionsArray.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
+    const totalLossPoints = transactionsArray.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
+    const pAndL = totalWinPoints - totalLossPoints
+    const averageWinPoints = Number((totalWinPoints / win.length).toFixed(2))
+    const averageLossPoints = Number((totalLossPoints / loss.length).toFixed(2))
+    const riskRatio = Number((averageWinPoints / averageLossPoints).toFixed(2))
+    const haveOpnePosition = transactionsArray.some(t => t.category === 'opening_position' && t.status === 'open')
+    const roundTrip = transactionsArray.reduce((acc, t) =>
+      t.category === 'closing_position' ? acc + t.quantity : acc, 0)
+    const netPAndL = pAndL - roundTrip
+    const result = {
+      haveOpnePosition: haveOpnePosition,
+      winCount: win.length,
+      lossCount: loss.length,
+      winRate: Number((winRate).toFixed(2)),
+      totalWinPoints: totalWinPoints,
+      totalLossPoints: totalLossPoints,
+      pAndL: pAndL,
+      roundTrip: roundTrip,
+      netPAndL: netPAndL,
+      averageWinPoints: averageWinPoints,
+      averageLossPoints: averageLossPoints,
+      riskRatio: riskRatio,
+      transactionsArray
+    }
+    return cb(null, {
+      status: 'success',
+      result
+    })
+  },
 }
 module.exports = transactionsServices

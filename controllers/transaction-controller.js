@@ -66,7 +66,14 @@ const transactionsController = {
   },
   getTransactionsForTheDay: (req, res, next) => {
     transactionsServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  }
+  },
+  getTransactions: (req, res, next) => {
+    const { startDate, endDate } = req.body
+    if (!startDate) return res.status(400).json({ status: 'error', message: 'startDate is required!' })
+    if (!endDate) return res.status(400).json({ status: 'error', message: 'endDate is required!' })
+
+    transactionsServices.getTransactions(req, { startDate, endDate }, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
 }
 
 module.exports = transactionsController

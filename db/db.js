@@ -239,4 +239,17 @@ module.exports = {
     `, [userId, date])
     return res.rows
   },
+  getTransactionsBetweenDates: async (userId, startDate, endDate) => {
+    const res = await pool.query(`SELECT t.*, json_agg(row_to_json(c_alias)) AS closures
+    FROM transactions t
+    LEFT JOIN (
+    SELECT c.open_transaction_id AS open_transaction_id, c.closed_transaction_id AS closed_transaction_id
+    FROM closures c
+    ) 
+    c_alias ON c_alias.open_transaction_id = t.id
+    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3
+    GROUP BY t.id
+    ORDER BY t.transaction_date`, [userId, startDate, endDate])
+    return res.rows
+  },
 }
