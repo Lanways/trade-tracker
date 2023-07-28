@@ -1,5 +1,6 @@
 const db = require('../db/db')
 const helpers = require('../_helpers')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const transactionsServices = {
   postTransaction: async (req, { action, quantity, price, transaction_date, description, ispublic }, cb) => {
@@ -42,8 +43,9 @@ const transactionsServices = {
       cb(err)
     }
   },
-  getTransaction: async (req, { transactionId }, cb) => {
-    const transaction = await db.getTransactionById(transactionId)
+  getTransaction: async (req, transactionId, cb) => {
+    const currentUserId = helpers.getUser(req).id
+    const transaction = await db.getTransactionById(transactionId, currentUserId)
     if (!transaction) return cb('Transaction is not exist!')
     return cb(null, {
       status: 'success',
@@ -116,12 +118,21 @@ const transactionsServices = {
     }
   },
   getPublicTransactions: async (req, cb) => {
-    const currentUserId = helpers.getUser(req).id
-    const transactions = await db.getPublicTransactions(currentUserId)
-    return cb(null, {
-      status: 'success',
-      transactions
-    })
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const page = Number(req.query.page) || 1
+      const limit = Number(req.query.limit) || 20
+      const offset = getOffset(limit, page)
+      const result = await db.getPublicTransactions(currentUserId, limit, offset)
+      const pagination = getPagination(limit, page, result.count)
+      return cb(null, {
+        status: 'success',
+        pagination: pagination,
+        transactions: result.transactions
+      })
+    } catch (err) {
+      return cb(err)
+    }
   },
   addLike: async (req, cb) => {
     try {
@@ -330,5 +341,18 @@ const transactionsServices = {
       result
     })
   },
+  getCurrentUserPublicTransaction: async (req, cb) => {
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const publicTransactions = await db.getCurrentUserPublicTransaction(currentUserId)
+      if (!publicTransactions) return cb('Transactions not found!')
+      return cb(null, {
+        status: 'success',
+        publicTransactions
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  }
 }
 module.exports = transactionsServices

@@ -14,7 +14,7 @@ const transactionsController = {
   getTransaction: (req, res, next) => {
     const transactionId = req.params.id
     if (!transactionId) return res.status(400).json({ status: 'error', message: `This transaction isn't exist!` })
-    transactionsServices.getTransaction(req, { transactionId }, (err, data) => err ? next(err) : res.status(200).json(data))
+    transactionsServices.getTransaction(req, transactionId, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   putTransaction: (req, res, next) => {
     const { action, quantity, price, transaction_date, description } = req.body
@@ -74,6 +74,12 @@ const transactionsController = {
 
     transactionsServices.getTransactions(req, { startDate, endDate }, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getDailyTransactions: (req, res, next) => {
+    transactionsServices.getDailyTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getCurrentUserPublicTransaction: (req, res, next) => {
+    transactionsServices.getCurrentUserPublicTransaction(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  }
 }
 
 module.exports = transactionsController

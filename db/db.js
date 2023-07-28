@@ -46,8 +46,20 @@ module.exports = {
     )
     return res.rows[0]
   },
-  getTransactionById: async (id) => {
-    const res = await pool.query('SELECT * FROM transactions WHERE id = $1', [id])
+  getTransactionById: async (transactionId, currentUserId) => {
+    const res = await pool.query(`
+    SELECT t.*,
+     CASE WHEN l.user_id = $2 THEN true ELSE false END AS is_like,
+     u.avatar AS transaction_user_avatar,
+     u.username AS transaction_user_name,
+     u.account AS transaction_user_account,
+     (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+     (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+    FROM transactions t
+    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $2
+    LEFT JOIN users u ON t.user_id = u.id
+    WHERE t.id = $1
+    `, [transactionId, currentUserId])
     return res.rows[0]
   },
   putTransactionById: async (action, quantity, price, transaction_date, description, transactionId) => {
@@ -117,22 +129,31 @@ module.exports = {
     const res = await pool.query('UPDATE transactions SET is_public = $1 WHERE id = $2', [newPublicValue, transactionId])
     return res.rows[0]
   },
-  getPublicTransactions: async (currentUserId) => {
-    const res = await pool.query(`
+  getPublicTransactions: async (currentUserId, limit, offset) => {
+    const transactionsRes = await pool.query(`
     SELECT t.*, 
-            CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
-            u.avatar AS transaction_user_avatar,
-            u.username AS transaction_user_name,
-            u.account AS transaction_user_account,
-            (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
-            (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
-     FROM transactions t
-     LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
-     LEFT JOIN users u ON t.user_id = u.id
-     WHERE t.is_public = true
-     ORDER BY t.transaction_date DESC
-    `, [currentUserId])
-    return res.rows
+     CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_liked,
+     u.avatar AS transaction_user_avatar,
+     u.username AS transaction_user_name,
+     u.account AS transaction_user_account,
+     (SELECT COUNT(*) FROM likes lc WHERE lc.transaction_id = t.id) AS like_count,
+     (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+    FROM transactions t
+    LEFT JOIN likes l ON t.id = l.transaction_id AND l.user_id = $1
+    LEFT JOIN users u ON t.user_id = u.id
+    WHERE t.is_public = true
+    ORDER BY t.transaction_date DESC
+    LIMIT $2 OFFSET $3
+    `, [currentUserId, limit, offset])
+    const countRes = await pool.query(`
+      SELECT COUNT(*)
+      FROM transactions t
+      WHERE t.is_public = true
+    `)
+    return {
+      transactions: transactionsRes.rows,
+      count: countRes.rows[0].count
+    }
   },
   createLike: async (userId, transactionId) => {
     const res = await pool.query(`INSERT INTO likes (user_id, transaction_id) VALUES($1, $2) RETURNING *`, [userId, transactionId])
@@ -173,9 +194,11 @@ module.exports = {
       SELECT users.id AS user_id, username, account, avatar,
         SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) as win_count,
         SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END) as loss_count,
+        COALESCE(
         CAST(SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) AS DECIMAL) /
-        (SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
-        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)) as win_rate
+        NULLIF((SUM(CASE WHEN t.pandl >= 1 THEN 1 ELSE 0 END) +
+        SUM(CASE WHEN t.pandl < 1 THEN 1 ELSE 0 END)), 0),
+        0) as win_rate
       FROM users
       LEFT JOIN transactions t ON t.user_id = users.id      
       GROUP BY users.id
@@ -245,4 +268,21 @@ module.exports = {
     ORDER BY t.transaction_date`, [userId, startDate, endDate])
     return res.rows
   },
+  getCurrentUserPublicTransaction: async (currentUserId) => {
+    const res = await pool.query(`
+      SELECT t.*,
+        CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_like,
+        u.avatar AS transaction_user_avatar,
+        u.username AS transaction_user_name,
+        u.account AS transaction_user_account,
+        (SELECT COUNT(*) FROM likes l WHERE l.transaction_id = t.id) AS likes_count,
+        (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+      FROM transactions t
+      LEFT JOIN users u ON t.user_id = u.id
+      LEFT JOIN likes l ON l.transaction_id = t.id AND l.user_id = $1
+      WHERE t.user_id = $1 AND t.is_public = true
+      ORDER BY t.transaction_date DESC
+    `, [currentUserId])
+    return res.rows
+  }
 }
