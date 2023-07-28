@@ -70,6 +70,9 @@ const transactionsController = {
   },
   getDailyTransactions: (req, res, next) => {
     transactionsServices.getDailyTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getCurrentUserPublicTransaction: (req, res, next) => {
+    transactionsServices.getCurrentUserPublicTransaction(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 

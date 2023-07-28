@@ -275,6 +275,19 @@ const transactionsServices = {
       status: 'success',
       dailyTransactions
     })
+  },
+  getCurrentUserPublicTransaction: async (req, cb) => {
+    try {
+      const currentUserId = helpers.getUser(req).id
+      const publicTransactions = await db.getCurrentUserPublicTransaction(currentUserId)
+      if (!publicTransactions) return cb('Transactions not found!')
+      return cb(null, {
+        status: 'success',
+        publicTransactions
+      })
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
 module.exports = transactionsServices

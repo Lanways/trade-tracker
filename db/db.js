@@ -230,5 +230,22 @@ module.exports = {
     ORDER BY date DESC
     `, [userId])
     return res.rows
+  },
+  getCurrentUserPublicTransaction: async (currentUserId) => {
+    const res = await pool.query(`
+      SELECT t.*,
+        CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_like,
+        u.avatar AS transaction_user_avatar,
+        u.username AS transaction_user_name,
+        u.account AS transaction_user_account,
+        (SELECT COUNT(*) FROM likes l WHERE l.transaction_id = t.id) AS likes_count,
+        (SELECT COUNT(*) FROM replies r WHERE r.transaction_id = t.id) AS replies_count
+      FROM transactions t
+      LEFT JOIN users u ON t.user_id = u.id
+      LEFT JOIN likes l ON l.transaction_id = t.id AND l.user_id = $1
+      WHERE t.user_id = $1 AND t.is_public = true
+      ORDER BY t.transaction_date DESC
+    `, [currentUserId])
+    return res.rows
   }
 }
