@@ -16,9 +16,10 @@ router.get('/top', authenticated, transactionsController.getTopUsers)
 router.get('/:id/daily', authenticated, transactionsController.getDailyTransactions)
 router.post('/range', authenticated, transactionsController.getTransactions)
 router.get('/public', authenticated, transactionsController.getPublicTransactions)
+router.get('/:id/history', authenticated, transactionsController.getHistoryTransactions)
+router.get('/:id/byDate',authenticated,transactionsController.getTransactionsForTheDay)
 router.get('/:id', authenticated, transactionsController.getTransaction)
 router.put('/:id', authenticated, transactionsController.putTransaction)
 router.delete('/:id', authenticated, transactionsController.removeTransaction)
 router.post('/', authenticated, transactionsController.postTransaction)
-
 module.exports = router
