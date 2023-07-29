@@ -279,11 +279,16 @@ const transactionsServices = {
   getCurrentUserPublicTransaction: async (req, cb) => {
     try {
       const currentUserId = helpers.getUser(req).id
-      const publicTransactions = await db.getCurrentUserPublicTransaction(currentUserId)
+      const page = Number(req.query.page) || 1
+      const limit = Number(req.query.limit) || 20
+      const offset = getOffset(page, limit)
+      const publicTransactions = await db.getCurrentUserPublicTransaction(currentUserId, limit, offset)
       if (!publicTransactions) return cb('Transactions not found!')
+      const pagination = getPagination(page, limit, publicTransactions.totalCount)
       return cb(null, {
         status: 'success',
-        publicTransactions
+        pagination,
+        publicTransactions: publicTransactions.result
       })
     } catch (err) {
       return cb(err)
