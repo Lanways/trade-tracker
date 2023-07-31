@@ -26,7 +26,10 @@ const userController = {
     const { username, introduction } = req.body
     if (!username) return res.status(400).json({ status: 'error', message: 'username is required' })
     userServices.putUser(req, { username, introduction }, (err, data) => err ? next(err) : res.status(200).json(data))
-  }
+  },
+  getTopUsers: (req, res, next) => {
+    userServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
 }
 
 module.exports = userController

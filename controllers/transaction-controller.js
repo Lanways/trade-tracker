@@ -58,9 +58,6 @@ const transactionsController = {
   getReplies: (req, res, next) => {
     transactionsServices.getReplies(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getTopUsers: (req, res, next) => {
-    transactionsServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
   getHistoryTransactions: (req, res, next) => {
     transactionsServices.getHistoryTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },

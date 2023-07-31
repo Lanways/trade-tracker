@@ -68,6 +68,17 @@ const userServices = {
       cb(err)
     }
   },
+  getTopUsers: async (req, cb) => {
+    try {
+      const topUsers = await db.getTopUsers()
+      return cb(null, {
+        status: 'success',
+        topUsers
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  },
 }
 
 module.exports = userServices
