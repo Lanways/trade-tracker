@@ -44,9 +44,6 @@ const transactionsController = {
   removeLike: (req, res, next) => {
     transactionsServices.removeLike(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getUserLikes: (req, res, next) => {
-    transactionsServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
   postReply: (req, res, next) => {
     const { content } = req.body
     if (!content) return res.status(400).json({ status: 'error', message: 'content is required!' })
@@ -58,24 +55,12 @@ const transactionsController = {
   getReplies: (req, res, next) => {
     transactionsServices.getReplies(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getTopUsers: (req, res, next) => {
-    transactionsServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
-  getHistoryTransactions: (req, res, next) => {
-    transactionsServices.getHistoryTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
-  getTransactionsForTheDay: (req, res, next) => {
-    transactionsServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
   getTransactions: (req, res, next) => {
     const { startDate, endDate } = req.body
     if (!startDate) return res.status(400).json({ status: 'error', message: 'startDate is required!' })
     if (!endDate) return res.status(400).json({ status: 'error', message: 'endDate is required!' })
 
     transactionsServices.getTransactions(req, { startDate, endDate }, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
-  getDailyTransactions: (req, res, next) => {
-    transactionsServices.getDailyTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   getCurrentUserPublicTransaction: (req, res, next) => {
     transactionsServices.getCurrentUserPublicTransaction(req, (err, data) => err ? next(err) : res.status(200).json(data))
