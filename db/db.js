@@ -277,7 +277,7 @@ module.exports = {
     ORDER BY t.transaction_date`, [userId, startDate, endDate])
     return res.rows
   },
-  getCurrentUserPublicTransaction: async (currentUserId) => {
+  getCurrentUserPublicTransaction: async (currentUserId, limit, offset) => {
     const res = await pool.query(`
       SELECT t.*,
         CASE WHEN l.user_id = $1 THEN true ELSE false END AS is_like,
@@ -291,7 +291,16 @@ module.exports = {
       LEFT JOIN likes l ON l.transaction_id = t.id AND l.user_id = $1
       WHERE t.user_id = $1 AND t.is_public = true
       ORDER BY t.transaction_date DESC
+      LIMIT $2 OFFSET $3
+    `, [currentUserId, limit, offset])
+    const totalCount = await pool.query(`
+    SELECT COUNT(*)
+    FROM transactions t
+    WHERE t.user_id = $1 AND t.is_public = true
     `, [currentUserId])
-    return res.rows
+    return {
+      result: res.rows,
+      totalCount: totalCount.rows[0].count
+    }
   }
 }
