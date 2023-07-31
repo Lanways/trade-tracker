@@ -253,10 +253,10 @@ const transactionsServices = {
         winRate: Number((winCount / (winCount + lossCount)).toFixed(2)),
         totalWinPoints,
         totalLossPoints,
-        pAndL: totalWinPoints - totalLossPoints,
+        pAndL: transactions.reduce((acc, t) => acc + t.pandl, 0),
         roundTrip: transactions.reduce((acc, t) =>
           t.category === 'closing_position' ? acc + t.quantity : acc, 0),
-        netPAndL: (totalWinPoints - totalLossPoints) - transactions.reduce((acc, t) =>
+        netPAndL: transactions.reduce((acc, t) => acc + t.pandl, 0) - transactions.reduce((acc, t) =>
           t.category === 'closing_position' ? acc + t.quantity : acc, 0),
         averageWinPoints,
         averageLossPoints,
@@ -278,7 +278,7 @@ const transactionsServices = {
 
     const winCount = transactions.filter(t => t.pandl >= 1).length
     const lossCount = transactions.filter(t => t.pandl !== null && t.pandl < 1).length
-    const totalWinPoints = transactions.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
+    const totalWinPoints = transactions.reduce((acc, t) => t.pandl >= 1 ? acc + Number(t.pandl) : acc, 0)
     const totalLossPoints = transactions.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
     const averageWinPoints = Number((totalWinPoints / winCount).toFixed(2))
     const averageLossPoints = Number((totalLossPoints / lossCount).toFixed(2))
@@ -290,10 +290,10 @@ const transactionsServices = {
       winRate: Number((winCount / (winCount + lossCount)).toFixed(2)),
       totalWinPoints,
       totalLossPoints,
-      pAndL: totalWinPoints - totalLossPoints,
+      pAndL: transactions.reduce((acc, t) => acc + t.pandl, 0),
       roundTrip: transactions.reduce((acc, t) =>
         t.category === 'closing_position' ? acc + t.quantity : acc, 0),
-      netPAndL: (totalWinPoints - totalLossPoints) - transactions.reduce((acc, t) =>
+      netPAndL: transactions.reduce((acc, t) => acc + t.pandl, 0) - transactions.reduce((acc, t) =>
         t.category === 'closing_position' ? acc + t.quantity : acc, 0),
       averageWinPoints,
       averageLossPoints,

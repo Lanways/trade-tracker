@@ -239,7 +239,9 @@ module.exports = {
           NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
       0) AS risk_ratio,
       SUM(pandl) AS pandl,
-      SUM(SUM(pandl)) OVER (ORDER BY DATE(transaction_date)) AS cumulative_pandl
+      SUM(SUM(pandl)) OVER (ORDER BY DATE(transaction_date)) AS cumulative_pandl,
+      SUM(CASE WHEN category= 'closing_position' THEN quantity ELSE 0 END) AS round_trip,
+      SUM(pandl) - SUM(CASE WHEN category= 'closing_position' THEN quantity ELSE 0 END) AS netpandl
     FROM transactions
     WHERE user_id = $1
     `
@@ -272,7 +274,7 @@ module.exports = {
     FROM closures c
     ) 
     c_alias ON c_alias.open_transaction_id = t.id
-    WHERE t.user_id = $1 AND t.transaction_date BETWEEN $2 AND $3
+    WHERE t.user_id = $1 AND t.category = 'closing_position' AND t.transaction_date BETWEEN $2 AND $3
     GROUP BY t.id
     ORDER BY t.transaction_date`, [userId, startDate, endDate])
     return res.rows
