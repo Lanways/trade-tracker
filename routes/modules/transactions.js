@@ -9,7 +9,6 @@ router.delete('/:id/deleteReplies', authenticated, transactionsController.delete
 router.get('/:id/replies', authenticated, transactionsController.getReplies)
 router.post('/:id/like', authenticated, transactionsController.addLike)
 router.delete('/:id/unlike', authenticated, transactionsController.removeLike)
-router.get('/:id/likes', authenticated, transactionsController.getUserLikes)
 router.post('/public/:id', authenticated, transactionsController.postPublic)
 router.delete('/public/:id', authenticated, transactionsController.deletePublic)
 router.get('/:id/daily', authenticated, transactionsController.getDailyTransactions)

@@ -30,6 +30,9 @@ const userController = {
   getTopUsers: (req, res, next) => {
     userServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getUserLikes: (req, res, next) => {
+    userServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
 }
 
 module.exports = userController

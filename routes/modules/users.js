@@ -5,8 +5,9 @@ const passport = require('../../config/passport')
 const { authenticated } = require('../../middleware/api-auth')
 const upload = require('../../middleware/multer')
 
-
+router.get('/:id/likes', authenticated, userController.getUserLikes)
 router.get('/top', authenticated, userController.getTopUsers)
+
 router.post('/signin', (req, res, next) => {
   if (!req.body.account || !req.body.password) return res.status(400).json({ status: 'error', message: "Account and Password is required" })
   next()
