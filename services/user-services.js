@@ -104,8 +104,8 @@ const userServices = {
       const transactions = await db.getTransactionsByDateRange(userId, startDate, endDate)
       const dailyTransactions = await db.getDailyTransactionsData(userId, startDate, endDate)
 
-      const winCount = transactions.filter(t => t.pandl >= 1).length
-      const lossCount = transactions.filter(t => t.pandl !== null && t.pandl < 1).length
+      const winCount = transactions.reduce((acc, t) => t.category === 'closing_position' && t.status === 'closed' && t.pandl >= 0 ? acc + t.quantity : acc, 0)
+      const lossCount = transactions.reduce((acc, t) => t.category === 'closing_position' && t.status === 'closed' && t.pandl < 0 ? acc + t.quantity : acc, 0)
       const totalWinPoints = transactions.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
       const totalLossPoints = transactions.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
       const averageWinPoints = Number((totalWinPoints / winCount).toFixed(2))
@@ -141,8 +141,9 @@ const userServices = {
     const date = req.query.date || new Date()
     const transactions = await db.getTransactionsByDate(userId, date)
 
-    const winCount = transactions.filter(t => t.pandl >= 1).length
-    const lossCount = transactions.filter(t => t.pandl !== null && t.pandl < 1).length
+    const winCount = transactions.reduce((acc, t) => t.category === 'closing_position' && t.status === 'closed' && t.pandl >= 0 ? acc + t.quantity : acc, 0)
+    const lossCount = transactions.reduce((acc, t) => t.category === 'closing_position' && t.status === 'closed' && t.pandl < 0 ? acc + t.quantity : acc, 0)
+
     const totalWinPoints = transactions.reduce((acc, t) => t.pandl > 1 ? acc + Number(t.pandl) : acc, 0)
     const totalLossPoints = transactions.reduce((acc, t) => t.pandl !== null && t.pandl < 1 ? acc + Math.abs(Number(t.pandl)) : acc, 0)
     const averageWinPoints = Number((totalWinPoints / winCount).toFixed(2))

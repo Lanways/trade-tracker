@@ -219,24 +219,25 @@ module.exports = {
   getDailyTransactionsData: async (userId, startDate, endDate) => {
     let query = `
     SELECT DATE(transaction_date) AS date,
-      SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) AS win_count,
-      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END) AS loss_count,
-      CAST(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END)AS DECIMAL) /
-      NULLIF((SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END) +
-      SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END)), 0) AS win_rate,
+      SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl >= 0 THEN quantity ELSE 0 END) AS winCount,
+      SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl < 0 THEN quantity ELSE 0 END) AS lossCount,
+      CAST(SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl >= 0 THEN quantity ELSE 0 END) AS DECIMAL) /
+      NULLIF((SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl >= 0 THEN quantity ELSE 0 END) +
+      SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl < 0 THEN quantity ELSE 0 END)), 0) AS win_rate,
       COALESCE(
           CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0),
+          NULLIF(SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl >= 0 THEN quantity ELSE 0 END), 0),
        0) AS average_win,
       COALESCE(
           ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)),
+          NULLIF(SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl < 0 THEN quantity ELSE 0 END), 0)),
        0) AS average_loss,
       COALESCE(
-          (COALESCE(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl >= 1 THEN 1 ELSE 0 END), 0), 0)) /
-          NULLIF((COALESCE(ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS  DECIMAL) /
-          NULLIF(SUM(CASE WHEN pandl < 1 THEN 1 ELSE 0 END), 0)), 0)), 0), 
+          COALESCE(CAST(SUM(CASE WHEN pandl >= 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl >= 0 THEN quantity ELSE 0 END), 0), 0) /
+          NULLIF(COALESCE(
+          ABS(CAST(SUM(CASE WHEN pandl < 1 THEN pandl ELSE 0 END)AS DECIMAL) /
+          NULLIF(SUM(CASE WHEN category = 'closing_position' AND status = 'closed' AND pandl < 0 THEN quantity ELSE 0 END), 0)),0), 0), 
       0) AS risk_ratio,
       SUM(pandl) AS pandl,
       SUM(SUM(pandl)) OVER (ORDER BY DATE(transaction_date)) AS cumulative_pandl,
