@@ -6,8 +6,9 @@ const { authenticated } = require('../../middleware/api-auth')
 const upload = require('../../middleware/multer')
 
 router.get('/:id/likes', authenticated, userController.getUserLikes)
+router.get('/:id/history', authenticated, userController.getHistoryTransactions)
+router.get('/:id/byDate', authenticated, userController.getTransactionsForTheDay)
 router.get('/top', authenticated, userController.getTopUsers)
-
 router.post('/signin', (req, res, next) => {
   if (!req.body.account || !req.body.password) return res.status(400).json({ status: 'error', message: "Account and Password is required" })
   next()

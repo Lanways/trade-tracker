@@ -33,6 +33,12 @@ const userController = {
   getUserLikes: (req, res, next) => {
     userServices.getUserLikes(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
+  getHistoryTransactions: (req, res, next) => {
+    userServices.getHistoryTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getTransactionsForTheDay: (req, res, next) => {
+    userServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  }
 }
 
 module.exports = userController

@@ -55,12 +55,6 @@ const transactionsController = {
   getReplies: (req, res, next) => {
     transactionsServices.getReplies(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
-  getHistoryTransactions: (req, res, next) => {
-    transactionsServices.getHistoryTransactions(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
-  getTransactionsForTheDay: (req, res, next) => {
-    transactionsServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
-  },
   getTransactions: (req, res, next) => {
     const { startDate, endDate } = req.body
     if (!startDate) return res.status(400).json({ status: 'error', message: 'startDate is required!' })
