@@ -304,5 +304,19 @@ module.exports = {
       result: res.rows,
       totalCount: totalCount.rows[0].count
     }
+  },
+  getUsers: async () => {
+    const res = await pool.query(`
+    SELECT u.id, u.username, u.account, u.email, u.avatar, u.role, u.created_on
+    FROM users u`, [])
+    return res.rows
+  },
+  deleteUser: async (userId) => {
+    const res = await pool.query(`
+    DELETE
+    FROM users
+    WHERE id = $1
+    RETURNING id, username, account, email, avatar, role, created_on`, [userId])
+    return res.rows
   }
 }
