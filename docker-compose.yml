@@ -1,24 +1,17 @@
 version: '3'
 services:
   db:
-    image: mysql:5.7
+    image: postgres
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: trade_tracker_test
-    volumes:
-      - ./mysql:/var/lib/mysql
-  web:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5433:5432"
+  app:
     build: .
-    command: npm test
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - "3000:3000"
     depends_on:
       - db
-    environment:
-      DATABASE_HOST: db
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: password
-      DATABASE_NAME: trade_tracker_test
+    command: sh -c "node main.js && node app.js"

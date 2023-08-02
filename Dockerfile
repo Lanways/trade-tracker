@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # 指定 Docker 容器啟動時要執行的命令
-CMD [ "npm", "start" ]
+CMD [ "node", "app.js" ]
