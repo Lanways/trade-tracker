@@ -9,9 +9,12 @@ const passport = require('./config/passport')
 const cors = require('cors')
 const port = process.env.PORT || 3000
 
-app.use(cors({
-  origin: 'http://localhost:3000'
-}))
+const corsOptions = {
+  origin: ['https://owenlu0125.github.io/StockChart/', 'http://localhost:3000'],
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: true }))
 app.use('/upload', express.static(path.join(__dirname, 'upload')))
 app.use(express.json())
