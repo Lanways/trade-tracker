@@ -258,4 +258,5 @@ const transactionsServices = {
     }
   }
 }
+
 module.exports = transactionsServices
