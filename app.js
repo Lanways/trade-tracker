@@ -10,7 +10,7 @@ const cors = require('cors')
 const port = process.env.PORT || 3000
 
 const corsOptions = {
-  origin: ['https://owenlu0125.github.io/StockChart/', 'http://localhost:3000'],
+  origin: ['https://owenlu0125.github.io', 'http://localhost:3000'],
   optionsSuccessStatus: 200
 }
 
