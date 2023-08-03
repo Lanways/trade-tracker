@@ -306,11 +306,20 @@ module.exports = {
       totalCount: totalCount.rows[0].count
     }
   },
-  getUsers: async () => {
+  getUsers: async (limit, offset) => {
     const res = await pool.query(`
     SELECT u.id, u.username, u.account, u.email, u.avatar, u.role, u.created_on
-    FROM users u`, [])
-    return res.rows
+    FROM users u
+    LIMIT $1 OFFSET $2
+    `, [limit, offset])
+    const totoCount = await pool.query(`
+    SELECT COUNT(*)
+    FROM users u
+    `)
+    return {
+      result: res.rows,
+      totoCount: totoCount.rows[0].count
+    }
   },
   deleteUser: async (userId) => {
     const res = await pool.query(`
