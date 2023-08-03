@@ -1,12 +1,18 @@
 const db = require('../db/db')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const adminServices = {
   getUsers: async (req, cb) => {
     try {
-      const users = await db.getUsers()
+      const page = Number(req.query.page) || 1
+      const limit = Number(req.query.limit) || 20
+      const offset = getOffset(limit, page)
+      const users = await db.getUsers(limit, offset)
+      const pagination = getPagination(limit, page, users.totalCount)
       return cb(null, {
         status: 'success',
-        users
+        pagination,
+        users: users.result
       })
     } catch (err) {
       cb(err)

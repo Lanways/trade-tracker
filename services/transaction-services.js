@@ -244,7 +244,7 @@ const transactionsServices = {
       const currentUserId = helpers.getUser(req).id
       const page = Number(req.query.page) || 1
       const limit = Number(req.query.limit) || 20
-      const offset = getOffset(page, limit)
+      const offset = getOffset(limit, page)
       const publicTransactions = await db.getCurrentUserPublicTransaction(currentUserId, limit, offset)
       if (!publicTransactions) return cb('Transactions not found!')
       const pagination = getPagination(page, limit, publicTransactions.totalCount)
