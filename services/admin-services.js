@@ -22,7 +22,7 @@ const adminServices = {
     try {
       const userId = req.params.id
       const user = await db.deleteUser(userId)
-      if (!user) return cb('User does not exist.')
+      if (user.length === 0) return cb('User does not exist.')
       return cb(null, {
         status: 'success',
         Delete_User_Data: user
