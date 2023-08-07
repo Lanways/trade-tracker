@@ -23,9 +23,13 @@ const userController = {
     userServices.getUser(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   putUser: (req, res, next) => {
-    const { username, introduction } = req.body
+    const { username, introduction, password, newPassword } = req.body
     if (!username) return res.status(400).json({ status: 'error', message: 'username is required' })
-    userServices.putUser(req, { username, introduction }, (err, data) => err ? next(err) : res.status(200).json(data))
+    if (!password) return res.status(400).json({ status: 'error', message: 'password is required' })
+    if (!newPassword) return res.status(400).json({ status: 'error', message: 'newPassword is required' })
+    if (req.user.id !== Number(req.params.id)) return res.status(400).json({ status: 'error', message: 'Edit self profile only!' })
+
+    userServices.putUser(req, { username, introduction, password, newPassword }, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   getTopUsers: (req, res, next) => {
     userServices.getTopUsers(req, (err, data) => err ? next(err) : res.status(200).json(data))

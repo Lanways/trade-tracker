@@ -34,8 +34,8 @@ module.exports = {
     const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
     return res.rows[0]
   },
-  updateUser: async (username, introduction, avatarPath, userId) => {
-    const updatedUserRes = await pool.query('UPDATE users SET username = $1, introduction = $2, avatar = $3, updated_on = NOW() WHERE id = $4 RETURNING *', [username, introduction, avatarPath, userId])
+  updateUser: async (username, password, introduction, avatarPath, userId) => {
+    const updatedUserRes = await pool.query('UPDATE users SET username = $1, password = $2, introduction = $3, avatar = $4, updated_on = NOW() WHERE id = $5 RETURNING *', [username, password, introduction, avatarPath, userId])
     return updatedUserRes.rows[0]
   },
   createTransaction: async (user_id, action, quantity, price, transaction_date, description, ispublic) => {
