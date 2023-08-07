@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const helpers = require('../_helpers')
 const jwt = require('jsonwebtoken')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+
 const userServices = {
   signUp: async ({ username, account, password, email }, cb) => {
     try {
@@ -49,20 +50,23 @@ const userServices = {
       user
     })
   },
-  putUser: async (req, { username, introduction }, cb) => {
+  putUser: async (req, { username, introduction, password, newPassword }, cb) => {
     const userId = helpers.getUser(req).id
     try {
       const user = await db.getUserById(userId)
       if (!user) return cb("User didn't exist!")
-      if (user.id !== Number(req.params.id)) return cb('Edit self profile only!')
-
+      const passwordMatch = await bcrypt.compare(password, user.password)
+      if (!passwordMatch) return cb('password is incorrect')
       const avatarPath = req.file ? await imgurFileHandler(req.file) : null
-      const { password, ...updatedUser } = await db.updateUser(
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10)
+      const { password: _, ...updatedUser } = await db.updateUser(
         username,
+        hashedNewPassword,
         introduction,
         avatarPath,
         userId
       )
+      if (!updatedUser) return cb('Failed to update user')
       cb(null, updatedUser)
     } catch (err) {
       cb(err)
