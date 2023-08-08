@@ -6,24 +6,12 @@ module.exports = async function seedUsers(pool) {
   console.log('user table count =', count)
 
   if (count === 0) {
-    let avatarArray = []
-    let i = 0
-    while (i <= 20) {
-      let count = Math.floor(Math.random() * 800)
-      let countSome = avatarArray.some(aa => aa === count)
-      if (!countSome) {
-        avatarArray.push(count)
-        i++
-      }
-    }
     for (let i = 1; i <= 20; i++) {
       let username = `user${i}`
       let account = `account${i}`
       let password = await bcrypt.hash('12345', 10)
       let email = `user${i}@example.com`
-      let randomCount = Math.floor(Math.random() * avatarArray.length)
-      let avatar = `https://robohash.org/${avatarArray[randomCount]}?set=set4`
-      avatarArray.splice(randomCount, 1)
+      let avatar = `https://robohash.org/${i}`
       let introduction = faker.lorem.sentence()
       let role = 'user'
 
