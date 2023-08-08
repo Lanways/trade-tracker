@@ -3,11 +3,11 @@ const helpers = require('../_helpers')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const transactionsServices = {
-  postTransaction: async (req, { action, quantity, price, transaction_date, description, ispublic }, cb) => {
+  postTransaction: async (req, { action, quantity, price, transaction_date, description, isPublic }, cb) => {
     try {
       const userId = helpers.getUser(req).id
       let remainingQuantity = quantity
-      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, ispublic)
+      let transaction = await db.createTransaction(userId, action, quantity, price, transaction_date, description, isPublic)
       //找反向交易
       let oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
       while (oppositeTransaction && remainingQuantity > 0) {
@@ -34,7 +34,7 @@ const transactionsServices = {
           await db.updateClosingTransaction(oppositeTransaction.open_quantity, 'closing_position', 0, 'closed', pandl, transaction.id)
           //更新剩餘數量、新增交易紀錄
           remainingQuantity -= oppositeTransaction.open_quantity
-          transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description)
+          transaction = await db.createTransaction(userId, action, remainingQuantity, price, transaction_date, description, isPublic)
           oppositeTransaction = await db.findOppositeOpenTransaction(userId, action)
         }
       }
