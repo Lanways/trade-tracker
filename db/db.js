@@ -40,10 +40,18 @@ module.exports = {
   },
   createTransaction: async (user_id, action, quantity, price, transaction_date, description, ispublic) => {
     const openQuantity = quantity
-    const res = await pool.query(
-      'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, is_public, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [user_id, action, quantity, price, transaction_date, description, ispublic, openQuantity]
-    )
+    let res
+    if (ispublic != null) {
+      res = await pool.query(
+        'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, is_public, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        [user_id, action, quantity, price, transaction_date, description, ispublic, openQuantity]
+      )
+    } else {
+      res = await pool.query(
+        'INSERT INTO transactions (user_id, action, quantity, price, transaction_date, description, open_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [user_id, action, quantity, price, transaction_date, description, openQuantity]
+      )
+    }
     return res.rows[0]
   },
   getTransactionById: async (transactionId, currentUserId) => {
