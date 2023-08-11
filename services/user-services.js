@@ -8,7 +8,8 @@ const userServices = {
   signUp: async ({ username, account, password, email }, cb) => {
     try {
       const hashed = await bcrypt.hash(password, 10)
-      const user = await db.createUser(username, account, hashed, email)
+      const avatar = `https://robohash.org/${account}?set=set4`
+      const user = await db.createUser(username, account, hashed, email, avatar)
       delete user.password
       return cb(null, {
         status: 'success',

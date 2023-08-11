@@ -18,11 +18,10 @@ module.exports = {
     const res = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     return res.rows[0]
   },
-
-  createUser: async (username, account, password, email) => {
+  createUser: async (username, account, password, email, avatar) => {
     const res = await pool.query(
-      'INSERT INTO users (username, account, password, email) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, account, password, email]
+      'INSERT INTO users (username, account, password, email, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [username, account, password, email, avatar]
     );
     return res.rows[0]
   },
