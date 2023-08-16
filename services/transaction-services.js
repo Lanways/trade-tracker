@@ -78,10 +78,27 @@ const transactionsServices = {
       const transactionId = req.params.id
       const transaction = await db.getTransactionById(transactionId)
       if (!transaction) return cb(`transaction isn't exist`)
-      const deleteTransaction = await db.deleteTransactionById(transactionId)
+
+      let openPositionId = ''
+      const transactionCategory = await db.getTransactionCategory(transactionId)
+      if (transactionCategory === 'closing_position') {
+        openPositionId = await db.getOpenPosition(transactionId)
+      }
+
+      const targetId = openPositionId || transactionId
+      const closures = await db.getClosures(targetId)
+
+      let remoedTransactions = []
+      for (let closure of closures) {
+        const removeTransaction = await db.deleteTransactionById(closure.closed_transaction_id)
+        remoedTransactions.push(removeTransaction)
+      }
+      const removedOpenPosition = await db.deleteTransactionById(targetId)
+
       return cb(null, {
         status: 'success',
-        deleteTransaction
+        remoedTransactions,
+        removedOpenPosition
       })
     } catch (err) {
       cb(err)
