@@ -335,5 +335,24 @@ module.exports = {
     WHERE id = $1
     RETURNING id, username, account, email, avatar, role, created_on`, [userId])
     return res.rows
+  },
+  getTransactionCategory: async (transactionId) => {
+    const res = await pool.query('SELECT category FROM transactions WHERE id = $1', [transactionId])
+    return res.rows[0].category
+  },
+  getOpenPosition: async (transactionId) => {
+    const res = await pool.query(`
+    SELECT open_transaction_id FROM closures c
+    WHERE c.closed_transaction_id = $1
+    `, [transactionId])
+    return res.rows[0].open_transaction_id
+  },
+  getClosures: async (transactionId) => {
+    const res = await pool.query(`
+    SELECT closed_transaction_id 
+    FROM closures c
+    WHERE c.open_transaction_id = $1
+    `, [transactionId])
+    return res.rows
   }
 }
