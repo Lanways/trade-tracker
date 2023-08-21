@@ -1,9 +1,0 @@
-# services:
-# - type: web
-#   name: my-app
-#   env: node
-#   # buildCommand: npm install
-#   # startCommand: npm run start:prod
-#   envVars:
-#   - key: NODE_ENV
-#     value: production
