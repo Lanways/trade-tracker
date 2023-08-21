@@ -1,17 +1,19 @@
 version: '3'
 services:
-  db:
+  postgres:
     image: postgres
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: password
     ports:
-      - "5433:5432"
+      - "5432:5432"
   app:
     build: .
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
     ports:
       - "3000:3000"
     depends_on:
-      - db
-    command: sh -c "node main.js && node app.js"
+      - postgres
+    command: node app.js
