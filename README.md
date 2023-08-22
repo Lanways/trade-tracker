@@ -46,7 +46,7 @@ docker exec -it <your_container_name> /bin/bash
 ```
 node main.js
 ```
-9. 此時資料庫已經有完整的種子資料，可以參閱[API Docs](https://www.notion.so/d7d3a9c7b49543e98d3bb0981cedb354?v=e85139adab4744eaa5d54d2e478dfbe4&pvs=4)並使用[API測試工具](https://www.postman.com/)開始測試。
+9. 此時資料庫已經有完整的種子資料，可以參閱[API Docs](https://romantic-rubidium-021.notion.site/Trade-Tracker-API-Docs-6c97b6fef83c4d63a8ad5d8405d0d03d?pvs=4)並使用[API測試工具](https://www.postman.com/)開始測試。
 
 10. 停止 Docker Compose
 想要停止專案時，只需在專案的根目錄終端機中執行：
@@ -91,7 +91,7 @@ express server is running on localhost:3000
 ## 路由列表
 
 請參考API文件說明以獲得詳細的路由清單、必要參數和回傳格式。
-* [API Docs](https://www.notion.so/d7d3a9c7b49543e98d3bb0981cedb354?v=e85139adab4744eaa5d54d2e478dfbe4&pvs=4)
+* [API Docs](https://romantic-rubidium-021.notion.site/Trade-Tracker-API-Docs-6c97b6fef83c4d63a8ad5d8405d0d03d?pvs=4)
 
 建議使用API測試工具進行測試。
 
