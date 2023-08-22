@@ -3,7 +3,7 @@ const LocalStrategy = require('passport-local')
 const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const db = require('../db/db')
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
 
@@ -42,5 +42,26 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
     return cb(err)
   }
 }))
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL
+},
+  async (accessToken, refreshToken, profile, cb) => {
+    try {
+      const { name, email } = profile._json
+      const existUser = await db.getUserByEmail(email)
+      if (existUser) return cb(null, existUser)
+      const randomPassword = Math.random().toString(36).slice(-8)
+      const hashed = await bcrypt.hash(randomPassword, 10)
+      const account = email
+      const user = await db.createUser(name, account, hashed, email)
+      return cb(null, user)
+    } catch (err) {
+      return cb(err, false)
+    }
+  }
+))
 
 module.exports = passport
