@@ -1,11 +1,23 @@
 const passport = require('../config/passport')
 const helpers = require('../_helpers')
+const client = require('../config/redis')
 
 const authenticated = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.status(401).json({ status: 'error', message: 'unauthorized' })
-    req.user = user
-    next()
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1]
+
+    client.get(token, (err, result) => {
+      if (err) {
+        return res.status(500).json({ status: 'error', message: 'Internal server error' })
+      }
+      if (result) {
+        return res.status(401).json({ status: 'error', message: 'Token is blacklisted' })
+      } else {
+        req.user = user
+        next()
+      }
+    })
   })(req, res, next)
 }
 

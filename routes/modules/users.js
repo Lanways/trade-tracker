@@ -15,6 +15,7 @@ router.post('/signin', (req, res, next) => {
 },
   passport.authenticate('local', { session: false }), userController.signIn
 )
+router.post('/logout', authenticated, userController.logout)
 router.put('/:id', upload.single('avatar'), authenticated, userController.putUser)
 router.get('/:id', authenticated, userController.getUser)
 router.post('/', userController.signUp)

@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const helpers = require('../_helpers')
 const jwt = require('jsonwebtoken')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const addTokenToBlackList = require('../helpers/blacklist-helper')
 
 const userServices = {
   signUp: async ({ username, account, password, email }, cb) => {
@@ -176,6 +177,14 @@ const userServices = {
       transactions
     })
   },
+  logout: (req, cb) => {
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1]
+    if (!token) return cb('Token not provided')
+
+    addTokenToBlackList(token, (err, reply) => {
+      err ? cb(err) : cb(null, { status: 'Logged out successfully' })
+    })
+  }
 }
 
 module.exports = userServices

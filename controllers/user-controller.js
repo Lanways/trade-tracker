@@ -42,6 +42,9 @@ const userController = {
   },
   getTransactionsForTheDay: (req, res, next) => {
     userServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  logout: (req, res, next) => {
+    userServices.logout(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 
