@@ -45,6 +45,9 @@ const userController = {
   },
   logout: (req, res, next) => {
     userServices.logout(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  refreshToken: (req, res, next) => {
+    userServices.refreshToken(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 
