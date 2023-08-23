@@ -354,5 +354,11 @@ module.exports = {
     WHERE c.open_transaction_id = $1
     `, [transactionId])
     return res.rows
+  },
+  getUserByEmail: async (email) => {
+    const res = await pool.query(`
+    SELECT * FROM users WHERE email = $1
+    `, [email])
+    return res.rows[0]
   }
 }
