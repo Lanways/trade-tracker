@@ -1,4 +1,6 @@
+const { resolve } = require('path')
 const client = require('../config/redis')
+const { reject } = require('p-cancelable')
 
 const addTokenToBlackList = (accessToken) => {
   return new Promise((resolve, reject) => {
@@ -6,9 +8,9 @@ const addTokenToBlackList = (accessToken) => {
   })
 }
 
-const delRefreshToken = (refreshToken) => {
+const delRefreshToken = (userId) => {
   return new Promise((resolve, reject) => {
-    client.del(refreshToken, (err, reply) => err ? reject(err) : resolve(reply === 1))
+    client.del(`refreshToken:${userId}`, (err, reply) => err ? reject(err) : resolve(reply === 1))
   })
 }
 
@@ -29,9 +31,18 @@ const setRefreshToken = (userId, refreshToken) => {
   })
 }
 
+const checkBlacklist = (accessToken) => {
+  return new Promise((resolve, reject) => {
+    client.get(accessToken, (err, result) => {
+      err ? reject(err) : resolve(result === 'blacklisted')
+    })
+  })
+}
+
 module.exports = {
   addTokenToBlackList,
   delRefreshToken,
   getRefreshToken,
-  setRefreshToken
+  setRefreshToken,
+  checkBlacklist
 }
