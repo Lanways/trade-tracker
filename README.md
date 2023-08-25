@@ -126,3 +126,4 @@ http://localhost:3000/api/signin
   * passport-jwt 4.0.1
   * passport-local 1.0.0
   * pg 8.11.1
+  * redis 3.1.2

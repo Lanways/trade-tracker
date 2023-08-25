@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../../controllers/user-controller')
 const passport = require('../../config/passport')
-const { authenticated } = require('../../middleware/api-auth')
+const { authenticated, checkRefreshToken } = require('../../middleware/api-auth')
 const upload = require('../../middleware/multer')
 
 router.get('/:id/likes', authenticated, userController.getUserLikes)
@@ -15,6 +15,8 @@ router.post('/signin', (req, res, next) => {
 },
   passport.authenticate('local', { session: false }), userController.signIn
 )
+router.post('/logout', authenticated, userController.logout)
+router.post('/refreshToken', checkRefreshToken, userController.refreshToken)
 router.put('/:id', upload.single('avatar'), authenticated, userController.putUser)
 router.get('/:id', authenticated, userController.getUser)
 router.post('/', userController.signUp)

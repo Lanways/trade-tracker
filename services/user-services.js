@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const helpers = require('../_helpers')
 const jwt = require('jsonwebtoken')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const { addTokenToBlackList, delRefreshToken, getRefreshToken, setRefreshToken } = require('../helpers/redis-helper')
 
 const userServices = {
   signUp: async ({ username, account, password, email }, cb) => {
@@ -30,11 +31,16 @@ const userServices = {
   signIn: async (req, cb) => {
     try {
       const { password, ...userWithoutPassword } = helpers.getUser(req)
-      const token = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '30d' })
+      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const refreshToken = jwt.sign(userWithoutPassword, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
+
+      await setRefreshToken(userWithoutPassword.id, refreshToken)
+
       cb(null, {
         status: 'success',
         data: {
-          token,
+          accessToken,
+          refreshToken,
           user: userWithoutPassword
         }
       })
@@ -176,6 +182,31 @@ const userServices = {
       transactions
     })
   },
+  logout: async (req, cb) => {
+    try {
+      const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
+      if (!accessToken) return cb('Token not provided')
+
+      await addTokenToBlackList(accessToken)
+      const refreshToken = getRefreshToken(helpers.getUser(req))
+      await delRefreshToken(refreshToken)
+      return cb(null, { status: 'Logged out successfully' })
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  refreshToken: async (req, cb) => {
+    try {
+      const { password, exp, iat, ...userWithoutPassword } = helpers.getUser(req)
+      const newAccessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      return cb(null, {
+        status: 'success',
+        accessToken: newAccessToken
+      })
+    } catch (err) {
+      return cb(err)
+    }
+  }
 }
 
 module.exports = userServices
