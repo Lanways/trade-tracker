@@ -186,10 +186,10 @@ const userServices = {
     try {
       const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
       if (!accessToken) return cb('Token not provided')
-
+      
       await addTokenToBlackList(accessToken)
-      const refreshToken = getRefreshToken(helpers.getUser(req))
-      await delRefreshToken(refreshToken)
+      await delRefreshToken(helpers.getUser(req).id)
+
       return cb(null, { status: 'Logged out successfully' })
     } catch (err) {
       return cb(err)
