@@ -38,7 +38,7 @@ const userController = {
           path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
-        return res.redirect('https://owenlu0125.github.io/StockChart/main?isAuthenticated=true')
+        return res.redirect('https://owenlu0125.github.io/StockChart/main')
       }
       res.status(200).json(data)
     })
