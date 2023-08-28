@@ -8,7 +8,11 @@ const authenticated = (req, res, next) => {
     if (err) return res.status(500).json({ status: 'error', message: 'Internal server error' })
     if (!user) return res.status(401).json({ status: 'error', message: 'User not authorized' })
 
-    const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
+    let accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
+
+    if (!accessToken && req.cookies) {
+      accessToken = req.cookies['accessToken']
+    }
 
     client.get(accessToken, (err, result) => {
       if (err) {
@@ -30,7 +34,7 @@ const authenticatedAdmin = (req, res, next) => {
 }
 
 const checkRefreshToken = (req, res, next) => {
-  const refreshToken = req.body.refreshToken
+  const refreshToken = req.body.refreshToken || req.cookies.refreshToken
   if (!refreshToken) {
     return res.status(400).json({ status: 'error', message: 'Refresh token is required.' })
   }

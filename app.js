@@ -10,10 +10,13 @@ const cors = require('cors')
 const port = process.env.PORT || 3000
 
 const corsOptions = {
-  origin: ['https://owenlu0125.github.io', 'http://localhost:3000'],
+  origin: ['https://owenlu0125.github.io', 'http://localhost:3000', 'http://localhost:5500'],
+  credentials: true,
   optionsSuccessStatus: 200
 }
+const cookieParser = require('cookie-parser')
 
+app.use(cookieParser())
 app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: true }))
 app.use('/upload', express.static(path.join(__dirname, 'upload')))

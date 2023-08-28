@@ -26,8 +26,17 @@ passport.use(new LocalStrategy(
   }
 ))
 
+const customExtractor = function (req) {
+  let token = null
+  token = ExtractJWT.fromAuthHeaderAsBearerToken()(req)
+  if (!token && req.cookies) {
+    token = req.cookies['accessToken']
+  }
+  return token
+}
+
 const jwtOptions = {
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: customExtractor,
   secretOrKey: process.env.JWT_SECRET
 }
 passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {

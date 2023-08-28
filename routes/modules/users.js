@@ -13,7 +13,12 @@ router.post('/signin', (req, res, next) => {
   if (!req.body.account || !req.body.password) return res.status(400).json({ status: 'error', message: "Account and Password is required" })
   next()
 },
-  passport.authenticate('local', { session: false }), userController.signIn
+  passport.authenticate('local', { session: false }),
+  (req, res, next) => {
+    req.isLocalStrategy = true
+    next()
+  },
+  userController.signIn
 )
 router.post('/logout', authenticated, userController.logout)
 router.post('/refreshToken', checkRefreshToken, userController.refreshToken)

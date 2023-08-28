@@ -17,7 +17,31 @@ const userController = {
     userServices.signUp({ account, username, password, email }, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   signIn: (req, res, next) => {
-    userServices.signIn(req, (err, data) => err ? next(err) : res.status(200).json(data))
+    userServices.signIn(req, (err, data) => {
+      if (err) {
+        return next(err)
+      }
+      if (!req.isLocalStrategy) {
+        res.cookie('accessToken', data.data.accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+          domain: 'owenlu0125.github.io',
+          path: '/api',
+          expires: new Date(Date.now() + 86400000)
+        })
+        res.cookie('refreshToken', data.data.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+          domain: 'owenlu0125.github.io',
+          path: '/api',
+          expires: new Date(Date.now() + 86400000)
+        })
+        return res.redirect('https://owenlu0125.github.io/StockChart/main')
+      }
+      res.status(200).json(data)
+    })
   },
   getUser: (req, res, next) => {
     userServices.getUser(req, (err, data) => err ? next(err) : res.status(200).json(data))

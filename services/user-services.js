@@ -36,7 +36,7 @@ const userServices = {
 
       await setRefreshToken(userWithoutPassword.id, refreshToken)
 
-      cb(null, {
+      return cb(null, {
         status: 'success',
         data: {
           accessToken,
@@ -186,7 +186,7 @@ const userServices = {
     try {
       const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
       if (!accessToken) return cb('Token not provided')
-      
+
       await addTokenToBlackList(accessToken)
       await delRefreshToken(helpers.getUser(req).id)
 
