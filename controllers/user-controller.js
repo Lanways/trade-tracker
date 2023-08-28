@@ -23,20 +23,22 @@ const userController = {
       }
       if (!req.isLocalStrategy) {
         res.cookie('accessToken', data.data.accessToken, {
-          secure: false,
+          httpOnly: true,
+          secure: true,
           sameSite: 'None',
-          domain: 'localhost',
+          domain: 'owenlu0125.github.io',
           path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
-          secure: false,
+          httpOnly: true,
+          secure: true,
           sameSite: 'None',
-          domain: 'localhost',
+          domain: 'owenlu0125.github.io',
           path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
-        return res.redirect('http://localhost:3000/StockChart/main?isAuthenticated=true')
+        return res.redirect('https://owenlu0125.github.io/StockChart/main?isAuthenticated=true')
       }
       res.status(200).json(data)
     })
