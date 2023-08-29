@@ -26,32 +26,24 @@ const userController = {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.github.io',
-          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: 'github.io',
-          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.owenlu0125.github.io',
-          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.owenlu0125.github.io',
-          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
