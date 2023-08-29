@@ -37,8 +37,8 @@ const userController = {
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
-          secure: true,
-          sameSite: 'None',
+          secure: false,
+          sameSite: 'Lax',
           domain: 'owenlu0125.github.io',
           expires: new Date(Date.now() + 86400000)
         })
