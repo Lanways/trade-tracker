@@ -27,6 +27,7 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: 'owenlu0125.github.io',
+          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
@@ -52,7 +53,7 @@ const userController = {
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
-        return res.redirect(301, 'https://owenlu0125.github.io/StockChart/login')
+        return res.redirect('https://owenlu0125.github.io/StockChart')
       }
       res.status(200).json(data)
     })
