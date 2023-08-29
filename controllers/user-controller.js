@@ -39,13 +39,15 @@ const userController = {
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
+          httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: 'www.owenlu0125.github.io',
+          domain: '.www.owenlu0125.github.io',
           path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
+          httpOnly: true,
           secure: true,
           sameSite: 'None',
           domain: '.owenlu0125.github.io',
