@@ -34,18 +34,21 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: 'owenlu0125.github.io',
+          path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
           secure: false,
           sameSite: 'Lax',
           domain: 'owenlu0125.github.io',
+          path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
           secure: true,
           sameSite: 'Lax',
-          domain: 'owenlu0125.github.io',
+          domain: 'owenlu0125.github.io/StockChart',
+          path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
