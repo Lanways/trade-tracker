@@ -47,7 +47,7 @@ const userController = {
         res.cookie('Authenticated', 'false', {
           secure: true,
           sameSite: 'None',
-          domain: 'owenlu0125.github.io/StockChart',
+          domain: 'owenlu0125.github.io',
           path: '/StockChart/login',
           expires: new Date(Date.now() + 86400000)
         })
