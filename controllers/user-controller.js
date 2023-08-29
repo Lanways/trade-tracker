@@ -42,14 +42,14 @@ const userController = {
           domain: 'owenlu0125.github.io',
           expires: new Date(Date.now() + 86400000)
         })
-        res.cookie('isAuthenticated', 'false', {
+        res.cookie('Authenticated', 'false', {
           secure: true,
           sameSite: 'Lax',
           domain: 'owenlu0125.github.io',
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
-        return res.redirect('https://owenlu0125.github.io/StockChart')      
+        return res.redirect('https://www.youtube.com')      
       }
       res.status(200).json(data)
     })
