@@ -26,29 +26,29 @@ const userController = {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.github.io',
-          path: '/',
+          domain: 'owenlu0125.github.io',
+          path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.github.io',
+          domain: 'github.io',
           path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
           secure: true,
           sameSite: 'None',
-          domain: '.github.io',
+          domain: 'www.owenlu0125.github.io',
           path: '/StockChart',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
           secure: true,
           sameSite: 'None',
-          domain: '.github.io',
+          domain: '.owenlu0125.github.io',
           path: '/StockChart/login',
           expires: new Date(Date.now() + 86400000)
         })
