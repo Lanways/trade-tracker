@@ -27,7 +27,6 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: 'owenlu0125.github.io',
-          path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
@@ -35,14 +34,12 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: 'owenlu0125.github.io',
-          path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
           secure: true,
           sameSite: 'None',
           domain: 'owenlu0125.github.io',
-          path: '/api',
           expires: new Date(Date.now() + 86400000)
         })
         return res.redirect('https://owenlu0125.github.io/StockChart/main')
