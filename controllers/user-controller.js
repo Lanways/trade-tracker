@@ -26,8 +26,8 @@ const userController = {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: 'owenlu0125.github.io',
-          path: '/StockChart',
+          domain: '.github.io',
+          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
@@ -35,15 +35,15 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: 'github.io',
-          path: '/StockChart',
+          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          domain: '.www.owenlu0125.github.io',
-          path: '/StockChart',
+          domain: '.owenlu0125.github.io',
+          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
@@ -51,7 +51,7 @@ const userController = {
           secure: true,
           sameSite: 'None',
           domain: '.owenlu0125.github.io',
-          path: '/StockChart/login',
+          path: '/',
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
