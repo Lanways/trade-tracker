@@ -42,7 +42,7 @@ const userController = {
           domain: 'owenlu0125.github.io',
           expires: new Date(Date.now() + 86400000)
         })
-        return res.redirect('https://owenlu0125.github.io/StockChart/login')
+        return res.redirect('https://owenlu0125.github.io/StockChart')
       }
       res.status(200).json(data)
     })
