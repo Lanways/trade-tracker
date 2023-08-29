@@ -52,7 +52,7 @@ const userController = {
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
-        return res.redirect(301, 'https://owenlu0125.github.io/StockChart/')
+        return res.redirect(301, 'https://owenlu0125.github.io/StockChart/login')
       }
       res.status(200).json(data)
     })
