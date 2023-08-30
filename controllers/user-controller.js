@@ -23,27 +23,27 @@ const userController = {
       }
       if (!req.isLocalStrategy) {
         res.cookie('accessToken', data.data.accessToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'None',
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: 'None',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'None',
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: 'None',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('isAuthenticated', 'true', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'None',
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: 'None',
           expires: new Date(Date.now() + 86400000)
         })
         res.cookie('Authenticated', 'false', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'None',
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: 'None',
           expires: new Date(Date.now() + 86400000)
         })
         console.log('ready redirect')
