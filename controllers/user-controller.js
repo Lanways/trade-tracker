@@ -23,10 +23,10 @@ const userController = {
       }
       if (!req.isLocalStrategy) {
         res.cookie('accessToken', data.data.accessToken, {
-          domain:'vegan-restaurant-forum.onrender.com',
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'None',
+          domain: 'vegan-restaurant-forum.onrender.com',
+          sameSite: 'None',
+          httpOnly: true,
+          secure: true,
           // expires: new Date(Date.now() + 86400000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
