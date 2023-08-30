@@ -23,32 +23,31 @@ const userController = {
       }
       if (!req.isLocalStrategy) {
         res.cookie('accessToken', data.data.accessToken, {
-          domain: 'vegan-restaurant-forum.onrender.com',
           sameSite: 'None',
           httpOnly: true,
           secure: true,
           // expires: new Date(Date.now() + 86400000)
         })
-        res.cookie('refreshToken', data.data.refreshToken, {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'None',
-          expires: new Date(Date.now() + 86400000)
-        })
-        res.cookie('isAuthenticated', 'true', {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'None',
-          expires: new Date(Date.now() + 86400000)
-        })
-        res.cookie('Authenticated', 'false', {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'None',
-          expires: new Date(Date.now() + 86400000)
-        })
+        // res.cookie('refreshToken', data.data.refreshToken, {
+        //   // httpOnly: true,
+        //   // secure: true,
+        //   // sameSite: 'None',
+        //   expires: new Date(Date.now() + 86400000)
+        // })
+        // res.cookie('isAuthenticated', 'true', {
+        //   // httpOnly: true,
+        //   // secure: true,
+        //   // sameSite: 'None',
+        //   expires: new Date(Date.now() + 86400000)
+        // })
+        // res.cookie('Authenticated', 'false', {
+        //   // httpOnly: true,
+        //   // secure: true,
+        //   // sameSite: 'None',
+        //   expires: new Date(Date.now() + 86400000)
+        // })
         console.log('ready redirect')
-        return res.redirect('https://vegan-restaurant-forum.onrender.com/signin')
+        return res.redirect('https://owenlu0125.github.io/StockChart')
       }
       res.status(200).json(data)
     })
