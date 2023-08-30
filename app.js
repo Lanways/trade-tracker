@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000
 
 const corsOptions = {
   origin: ['https://owenlu0125.github.io', 'http://localhost:3000', 'http://localhost:5500','https://vegan-restaurant-forum.onrender.com'],
-  // credentials: true,
+  credentials: true,
   optionsSuccessStatus: 200
 }
 const cookieParser = require('cookie-parser')
