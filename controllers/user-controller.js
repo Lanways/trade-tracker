@@ -23,7 +23,7 @@ const userController = {
       }
       if (!req.isLocalStrategy) {
         res.cookie('accessToken', data.data.accessToken, {
-          domin:'vegan-restaurant-forum.onrender.com',
+          domain:'vegan-restaurant-forum.onrender.com',
           // httpOnly: true,
           // secure: true,
           // sameSite: 'None',
