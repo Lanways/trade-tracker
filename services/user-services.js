@@ -49,8 +49,8 @@ const userServices = {
     }
   },
   getUser: async (req, cb) => {
-    const id = req.params.id
-    const { password, ...user } = await db.getUserById(id)
+    const userId = helpers.getUser(req).id
+    const { password, ...user } = await db.getUserById(userId)
     if (!user) return cb(`User didn't exist`)
     return cb(null, {
       status: 'success',
@@ -184,10 +184,14 @@ const userServices = {
   },
   logout: async (req, cb) => {
     try {
-      const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
+      let accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
+      if (!accessToken && req.cookies) {
+        accessToken = req.cookies.accessToken
+      }
       if (!accessToken) return cb('Token not provided')
 
       await addTokenToBlackList(accessToken)
+      console.log('userId', helpers.getUser(req).id)
       await delRefreshToken(helpers.getUser(req).id)
 
       return cb(null, { status: 'Logged out successfully' })

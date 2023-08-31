@@ -7,12 +7,11 @@ const authenticated = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err) return res.status(500).json({ status: 'error', message: 'Internal server error' })
     if (!user) return res.status(401).json({ status: 'error', message: 'User not authorized' })
-
     let accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
-
     if (!accessToken && req.cookies) {
       accessToken = req.cookies['accessToken']
     }
+    if (!accessToken) return res.status(401).json({ status: 'error', message: 'Can not find accessToken' })
 
     client.get(accessToken, (err, result) => {
       if (err) {

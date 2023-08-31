@@ -23,7 +23,7 @@ router.post('/signin', (req, res, next) => {
 router.post('/logout', authenticated, userController.logout)
 router.post('/refreshToken', checkRefreshToken, userController.refreshToken)
 router.put('/:id', upload.single('avatar'), authenticated, userController.putUser)
-router.get('/:id', authenticated, userController.getUser)
+router.get('/', authenticated, userController.getUser)
 router.post('/', userController.signUp)
 
 module.exports = router
