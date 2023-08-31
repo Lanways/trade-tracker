@@ -191,7 +191,6 @@ const userServices = {
       if (!accessToken) return cb('Token not provided')
 
       await addTokenToBlackList(accessToken)
-      console.log('userId', helpers.getUser(req).id)
       await delRefreshToken(helpers.getUser(req).id)
 
       return cb(null, { status: 'Logged out successfully' })

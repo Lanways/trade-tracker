@@ -65,7 +65,12 @@ const userController = {
     userServices.getTransactionsForTheDay(req, (err, data) => err ? next(err) : res.status(200).json(data))
   },
   logout: (req, res, next) => {
-    userServices.logout(req, (err, data) => err ? next(err) : res.status(200).json(data))
+    userServices.logout(req, (err, data) => {
+      if (err) return next(err)
+      res.cookie('accessToken', '', { expires: new Date(0), httpOnly: true });
+      res.cookie('refreshToken', '', { expires: new Date(0), httpOnly: true });
+      return res.status(200).json(data)
+    })
   },
   refreshToken: (req, res, next) => {
     userServices.refreshToken(req, (err, data) => err ? next(err) : res.status(200).json(data))
