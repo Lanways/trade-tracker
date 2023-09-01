@@ -31,7 +31,7 @@ const userServices = {
   signIn: async (req, cb) => {
     try {
       const { password, ...userWithoutPassword } = helpers.getUser(req)
-      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '10s' })
       const refreshToken = jwt.sign(userWithoutPassword, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
 
       await setRefreshToken(userWithoutPassword.id, refreshToken)

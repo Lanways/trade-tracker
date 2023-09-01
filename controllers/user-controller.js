@@ -26,7 +26,7 @@ const userController = {
           httpOnly: true,
           secure: true,
           sameSite: 'None',
-          expires: new Date(Date.now() + 60000)
+          expires: new Date(Date.now() + 10000)
         })
         res.cookie('refreshToken', data.data.refreshToken, {
           httpOnly: true,
