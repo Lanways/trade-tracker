@@ -1,6 +1,4 @@
-const { resolve } = require('path')
 const client = require('../config/redis')
-const { reject } = require('p-cancelable')
 
 const addTokenToBlackList = (accessToken) => {
   return new Promise((resolve, reject) => {
