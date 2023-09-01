@@ -21,6 +21,8 @@ const authenticated = (req, res, next) => {
         return res.status(401).json({ status: 'error', message: 'Token is blacklisted' })
       } else {
         req.user = user
+        req.accessToken = accessToken
+        req.refreshToken = refreshToken
         next()
       }
     })

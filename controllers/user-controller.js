@@ -74,6 +74,9 @@ const userController = {
   },
   refreshToken: (req, res, next) => {
     userServices.refreshToken(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getToken: (req, res, next) => {
+    userServices.getToken(req, (err, data) => err ? next(err) : res.status(200).json(data))
   }
 }
 

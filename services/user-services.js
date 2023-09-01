@@ -212,6 +212,19 @@ const userServices = {
     } catch (err) {
       return cb(err)
     }
+  },
+  getToken: async (req, cb) => {
+    try {
+      if (!req.user) return cb('User is not authenticated')
+
+      return cb(null, {
+        status: 'success',
+        accessToken: req.accessToken,
+        refreshToken: req.refreshToken
+      })
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
 
