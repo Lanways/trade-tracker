@@ -20,7 +20,7 @@ router.post('/signin', (req, res, next) => {
   },
   userController.signIn
 )
-router.post('/logout', userController.logout)
+router.post('/logout', authenticated, userController.logout)
 router.post('/refreshToken', checkRefreshToken, userController.refreshToken)
 router.put('/:id', upload.single('avatar'), authenticated, userController.putUser)
 router.get('/', authenticated, userController.getUser)
