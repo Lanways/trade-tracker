@@ -13,6 +13,9 @@ const authenticated = (req, res, next) => {
     }
     if (!accessToken) return res.status(401).json({ status: 'error', message: 'Can not find accessToken' })
 
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) return res.status(401).json({ status: 'error', message: 'Can not find refreshToken' })
+
     client.get(accessToken, (err, result) => {
       if (err) {
         return res.status(500).json({ status: 'error', message: 'Internal server error' })
