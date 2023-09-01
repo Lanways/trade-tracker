@@ -13,12 +13,17 @@ router.post('/signin', (req, res, next) => {
   if (!req.body.account || !req.body.password) return res.status(400).json({ status: 'error', message: "Account and Password is required" })
   next()
 },
-  passport.authenticate('local', { session: false }), userController.signIn
+  passport.authenticate('local', { session: false }),
+  (req, res, next) => {
+    req.isLocalStrategy = true
+    next()
+  }, userController.signIn
 )
+router.get('/token', authenticated, userController.getToken)
 router.post('/logout', authenticated, userController.logout)
 router.post('/refreshToken', checkRefreshToken, userController.refreshToken)
 router.put('/:id', upload.single('avatar'), authenticated, userController.putUser)
-router.get('/:id', authenticated, userController.getUser)
+router.get('/', authenticated, userController.getUser)
 router.post('/', userController.signUp)
 
 module.exports = router

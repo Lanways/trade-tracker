@@ -10,6 +10,10 @@ router.get('/google', passport.authenticate('google', {
 
 router.get('/google/callback',
   passport.authenticate('google', { session: false }),
+  (req, res, next) => {
+    req.isLocalStrategy = false
+    next()
+  },
   userController.signIn
 )
 
