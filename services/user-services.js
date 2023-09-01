@@ -191,7 +191,9 @@ const userServices = {
       if (!accessToken) return cb('Token not provided')
 
       await addTokenToBlackList(accessToken)
-      await delRefreshToken(helpers.getUser(req).id)
+      const userId = jwt.verify(accessToken, process.env.JWT_SECRET).id
+      console.log('userId', userId)
+      await delRefreshToken(userId)
 
       return cb(null, { status: 'Logged out successfully' })
     } catch (err) {
