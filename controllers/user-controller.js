@@ -77,6 +77,22 @@ const userController = {
   },
   refreshToken: (req, res, next) => {
     userServices.refreshToken(req, (err, data) => err ? next(err) : res.status(200).json(data))
+  },
+  getToken: (req, res, next) => {
+    try {
+      const accessToken = req.cookies.accessToken
+      if (!accessToken) return res.status(400).json({ status: 'error', message: `accessToken doesn't exist` })
+      const refreshToken = req.cookies.refreshToken
+      if (!refreshToken) return res.status(400).json({ status: 'error', message: `refreshToken doesn't exist` })
+
+      return res.status(200).json({
+        status: 'success',
+        accessToken,
+        refreshToken
+      })
+    } catch (err) {
+      next(err)
+    }
   }
 }
 
