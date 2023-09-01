@@ -188,12 +188,13 @@ const userServices = {
       if (!accessToken && req.cookies) {
         accessToken = req.cookies.accessToken
       }
-      if (!accessToken) return cb('Token not provided')
-
-      await addTokenToBlackList(accessToken)
-      const userId = jwt.verify(accessToken, process.env.JWT_SECRET).id
-      console.log('userId', userId)
-      await delRefreshToken(userId)
+      // if (!accessToken) return cb('Token not provided')
+      if (accessToken) {
+        await addTokenToBlackList(accessToken)
+        const userId = jwt.verify(accessToken, process.env.JWT_SECRET).id
+        console.log('userId', userId)
+        await delRefreshToken(userId)
+      }
 
       return cb(null, { status: 'Logged out successfully' })
     } catch (err) {
