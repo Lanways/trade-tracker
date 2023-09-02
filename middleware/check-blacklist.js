@@ -1,6 +1,6 @@
 const { checkBlacklist } = require('../helpers/redis-helper')
 
-const checkBlacklist = async (req, res, next) => {
+const checkBlacklisted = async (req, res, next) => {
   const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
   if (!accessToken) {
     return res.status(401).json({ status: 'error', message: 'Token not provided' })
@@ -17,4 +17,6 @@ const checkBlacklist = async (req, res, next) => {
   }
 }
 
-module.exports = checkBlacklist
+module.exports = {
+  checkBlacklisted
+}
