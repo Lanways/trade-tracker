@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000
 
 const corsOptions = {
   origin: ['https://owenlu0125.github.io', 'http://localhost:5501'],
-  optionsSuccessStatus: 200
+  credentials: true,
 }
 const cookieParser = require('cookie-parser')
 
