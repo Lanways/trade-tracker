@@ -21,6 +21,7 @@ router.post('/api/users/signin', (req, res, next) => {
   }, userController.signIn
 )
 router.post('/api/users/refreshToken', checkRefreshToken, userController.refreshToken)
+router.get('/api/users/token', authenticated, userController.getToken)
 router.post('/api/users', userController.signUp)
 
 router.use('/api/users', authenticated, checkBlacklisted, users)
