@@ -31,7 +31,7 @@ const userServices = {
   signIn: async (req, cb) => {
     try {
       const { password, ...userWithoutPassword } = helpers.getUser(req)
-      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '15m' })
       const refreshToken = jwt.sign(userWithoutPassword, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
 
       await setRefreshToken(userWithoutPassword.id, refreshToken)
@@ -195,7 +195,7 @@ const userServices = {
   refreshToken: async (req, cb) => {
     try {
       const { password, exp, iat, ...userWithoutPassword } = helpers.getUser(req)
-      const newAccessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const newAccessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '15m' })
       
       return cb(null, {
         status: 'success',
