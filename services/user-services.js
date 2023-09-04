@@ -31,7 +31,7 @@ const userServices = {
   signIn: async (req, cb) => {
     try {
       const { password, ...userWithoutPassword } = helpers.getUser(req)
-      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '15m' })
       const refreshToken = jwt.sign(userWithoutPassword, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
 
       await setRefreshToken(userWithoutPassword.id, refreshToken)
@@ -49,8 +49,8 @@ const userServices = {
     }
   },
   getUser: async (req, cb) => {
-    const id = req.params.id
-    const { password, ...user } = await db.getUserById(id)
+    const userId = helpers.getUser(req).id
+    const { password, ...user } = await db.getUserById(userId)
     if (!user) return cb(`User didn't exist`)
     return cb(null, {
       status: 'success',
@@ -182,13 +182,10 @@ const userServices = {
       transactions
     })
   },
-  logout: async (req, cb) => {
+  logout: async (accessToken, userId, cb) => {
     try {
-      const accessToken = req.headers.authorization && req.headers.authorization.split(' ')[1]
-      if (!accessToken) return cb('Token not provided')
-      
       await addTokenToBlackList(accessToken)
-      await delRefreshToken(helpers.getUser(req).id)
+      await delRefreshToken(userId)
 
       return cb(null, { status: 'Logged out successfully' })
     } catch (err) {
@@ -198,7 +195,8 @@ const userServices = {
   refreshToken: async (req, cb) => {
     try {
       const { password, exp, iat, ...userWithoutPassword } = helpers.getUser(req)
-      const newAccessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '1m' })
+      const newAccessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, { expiresIn: '15m' })
+      
       return cb(null, {
         status: 'success',
         accessToken: newAccessToken

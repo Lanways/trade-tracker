@@ -26,8 +26,17 @@ passport.use(new LocalStrategy(
   }
 ))
 
+const customExtractor = function (req) {
+  let token = null
+  token = ExtractJWT.fromAuthHeaderAsBearerToken()(req)
+  if (!token && req.cookies) {
+    token = req.cookies['accessToken']
+  }
+  return token
+}
+
 const jwtOptions = {
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: customExtractor,
   secretOrKey: process.env.JWT_SECRET
 }
 passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
@@ -56,7 +65,9 @@ passport.use(new GoogleStrategy({
       const randomPassword = Math.random().toString(36).slice(-8)
       const hashed = await bcrypt.hash(randomPassword, 10)
       const account = email
-      const user = await db.createUser(name, account, hashed, email)
+      const randomNumber = Math.floor(Math.random() * 100) + 1
+      const avatar = `https://robohash.org/${randomNumber}?set=set4`
+      const user = await db.createUser(name, account, hashed, email, avatar)
       return cb(null, user)
     } catch (err) {
       return cb(err, false)
