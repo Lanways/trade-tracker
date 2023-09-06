@@ -16,6 +16,7 @@ services:
       - .env
     environment:
       DB_HOST: postgres
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     depends_on:
