@@ -1,6 +1,8 @@
 const passport = require('../config/passport')
 const helpers = require('../_helpers')
 const jwt = require('jsonwebtoken')
+const db = require('../db/db')
+const { getRefreshToken } = require('../helpers/redis-helper')
 
 const authenticated = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
@@ -16,7 +18,7 @@ const authenticatedAdmin = (req, res, next) => {
   return res.status(403).json({ status: 'error', message: 'permission denied' })
 }
 
-const checkRefreshToken = (req, res, next) => {
+const checkRefreshToken = async (req, res, next) => {
   const refreshToken = req.body.refreshToken
   if (!refreshToken) {
     return res.status(400).json({ status: 'error', message: 'Refresh token is required.' })
@@ -24,6 +26,11 @@ const checkRefreshToken = (req, res, next) => {
   try {
     const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
     req.user = user
+    await getRefreshToken(req.user)
+    const dbCheck = await db.findOneUserByAccount(req.user.account)
+    if (!dbCheck) {
+      return res.status(400).json({ status: 'error', message: 'account does not exist.' })
+    }
     next()
   } catch (err) {
     return res.status(401).json({ error: 'Invalid refresh token.' })
