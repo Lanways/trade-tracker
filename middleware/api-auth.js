@@ -33,7 +33,6 @@ const checkRefreshToken = async (req, res, next) => {
     }
     next()
   } catch (err) {
-    console.error("An error occurred:", err)
     return res.status(401).json({ error: 'Invalid refresh token.' })
   }
 }
