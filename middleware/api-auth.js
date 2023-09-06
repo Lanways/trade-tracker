@@ -27,9 +27,9 @@ const checkRefreshToken = async (req, res, next) => {
     const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
     req.user = user
     await getRefreshToken(req.user)
-    const dbDataAuth = await db.findOneUserByAccount(req.user.account)
-    if (!dbDataAuth) {
-      return res.status(400).json({ status: 'error', message: 'Refresh token is required.' })
+    const dbCheck = await db.findOneUserByAccount(req.user.account)
+    if (!dbCheck) {
+      return res.status(400).json({ status: 'error', message: 'account does not exist.' })
     }
     next()
   } catch (err) {
