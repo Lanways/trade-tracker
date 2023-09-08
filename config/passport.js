@@ -30,7 +30,7 @@ const customExtractor = function (req) {
   let token = null
   token = ExtractJWT.fromAuthHeaderAsBearerToken()(req)
   if (!token && req.cookies) {
-    token = req.cookies['accessToken']
+    token = req.cookies['accessToken']  
   }
   return token
 }
