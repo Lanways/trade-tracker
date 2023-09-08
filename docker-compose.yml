@@ -1,17 +1,22 @@
 version: '3'
 services:
   postgres:
-    image: postgres
+    image: postgres:15.4
     environment:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
+  redis:
+    image: redis:7.2.1
+    ports:
+      - "6379:6379"
   app:
     build: .
     env_file:
       - .env
     environment:
       DB_HOST: postgres
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     depends_on:
